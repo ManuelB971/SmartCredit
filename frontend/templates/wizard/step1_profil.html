@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Profil - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Étape 1/3 - Votre Profil</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="step1-form">
+                            <div class="mb-3">
+                                <label class="form-label">Quel âge avez-vous ?</label>
+                                <input type="number" class="form-control" name="age" min="18" max="100" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Situation familiale</label>
+                                <select class="form-select" name="situation_familiale" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option value="CELIBATAIRE">Célibataire</option>
+                                    <option value="MARIE">Marié(e)</option>
+                                    <option value="PACSE">Pacsé(e)</option>
+                                    <option value="CONCUBINAGE">En concubinage</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Où habitez-vous ?</label>
+                                <input type="text" class="form-control" name="ville" placeholder="Paris, Marseille, etc." required>
+                            </div>
+
+                            <div class="form-footer">
+                                <button type="submit" class="btn btn-primary">Continuer →</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

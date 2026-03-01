@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+
+{% block title %}Comparaison - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Comparaison détaillée des scénarios</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Indicateur</th>
+                                        <th class="text-center">Prudent</th>
+                                        <th class="text-center">Équilibré</th>
+                                        <th class="text-center">Confortable</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><strong>Taux d'intérêt</strong></td>
+                                        <td class="text-center">3,20%</td>
+                                        <td class="text-center">3,31%</td>
+                                        <td class="text-center">3,50%</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Mensualité</strong></td>
+                                        <td class="text-center">1 350€</td>
+                                        <td class="text-center">1 419€</td>
+                                        <td class="text-center">1 500€</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Coût total du crédit</strong></td>
+                                        <td class="text-center">80 000€</td>
+                                        <td class="text-center">90 560€</td>
+                                        <td class="text-center">100 000€</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Taux d'endettement</strong></td>
+                                        <td class="text-center"><span class="badge bg-success">23.6%</span></td>
+                                        <td class="text-center"><span class="badge bg-success">27.8%</span></td>
+                                        <td class="text-center"><span class="badge bg-warning">32.1%</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Reste à vivre</strong></td>
+                                        <td class="text-center">1 750€</td>
+                                        <td class="text-center">1 681€</td>
+                                        <td class="text-center">1 600€</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Score de faisabilité</strong></td>
+                                        <td class="text-center"><span class="badge bg-success">88/100</span></td>
+                                        <td class="text-center"><span class="badge bg-success">85/100</span></td>
+                                        <td class="text-center"><span class="badge bg-warning">75/100</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="row row-deck row-cards mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Recommandations</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="alert alert-info">
+                            <h4>Scénario recommandé : Équilibré</h4>
+                            <p>Ce scénario offre le meilleur équilibre entre mensualité raisonnable et coût total. Votre score de 85/100 indique une excellente faisabilité.</p>
+                        </div>
+
+                        <h4>Points forts de votre dossier:</h4>
+                        <ul>
+                            <li>✓ Taux d'endettement très en dessous du plafond de 35%</li>
+                            <li>✓ CDI stable depuis 3 ans</li>
+                            <li>✓ Apport personnel de 30 000€ (12%)</li>
+                            <li>✓ Reste à vivre confortable</li>
+                        </ul>
+
+                        <h4>Points à améliorer:</h4>
+                        <ul>
+                            <li>→ Envisager une légère réduction des charges si possible</li>
+                            <li>→ Augmenter l'apport personnel pour obtenir un meilleur taux</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

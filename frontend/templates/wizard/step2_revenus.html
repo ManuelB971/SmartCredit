@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Revenus - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Étape 2/3 - Revenus & Charges</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="step2-form">
+                            <h4>Revenus</h4>
+                            <div class="mb-3">
+                                <label class="form-label">Revenus nets mensuels (€)</label>
+                                <input type="number" class="form-control" name="revenus_mensuels" min="0" step="100" required>
+                            </div>
+
+                            <h4>Charges actuelles</h4>
+                            <div class="mb-3">
+                                <label class="form-label">Loyer/Crédit immobilier (€)</label>
+                                <input type="number" class="form-control" name="charges_logement" min="0" step="50" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Crédits en cours (€)</label>
+                                <input type="number" class="form-control" name="charges_credits" min="0" step="50" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Autres charges (€)</label>
+                                <input type="number" class="form-control" name="charges_autres" min="0" step="50">
+                            </div>
+
+                            <h4>Emploi</h4>
+                            <div class="mb-3">
+                                <label class="form-label">Type de contrat</label>
+                                <select class="form-select" name="type_contrat" required>
+                                    <option value="">-- Sélectionner --</option>
+                                    <option value="CDI">CDI</option>
+                                    <option value="CDD">CDD</option>
+                                    <option value="STAGE">Stage</option>
+                                    <option value="ALTERNANCE">Alternance</option>
+                                    <option value="TRAVAILLEUR_INDEPENDANT">Travailleur indépendant</option>
+                                </select>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Ancienneté dans l'emploi (mois)</label>
+                                <input type="number" class="form-control" name="anciennete_emploi_mois" min="0" step="1" required>
+                            </div>
+
+                            <div class="form-footer">
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">← Retour</button>
+                                <button type="submit" class="btn btn-primary">Continuer →</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+
+{% block title %}Analyse... - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards justify-content-center">
+            <div class="col-md-6">
+                <div class="card text-center py-6">
+                    <div class="card-body">
+                        <div class="mb-4">
+                            <div class="spinner-border" role="status">
+                                <span class="visually-hidden">Analyse en cours...</span>
+                            </div>
+                        </div>
+                        <h3>Analyse en cours...</h3>
+                        <p class="text-muted">Notre IA analyse votre situation financière</p>
+                        <div class="progress">
+                            <div class="progress-bar progress-bar-indeterminate"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Redirect to results after calculation
+    setTimeout(() => {
+        // This will be handled by the API
+    }, 3000);
+</script>
+{% endblock %}

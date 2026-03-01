@@ -1,0 +1,152 @@
+{% extends 'base.html' %}
+
+{% block title %}Résultats - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Vos Résultats</h3>
+                    </div>
+                    <div class="card-body">
+                        <!-- Score badge -->
+                        <div class="mb-4">
+                            <h4>Score de faisabilité</h4>
+                            <div class="progress" style="height: 2rem;">
+                                <div class="progress-bar bg-success" role="progressbar" style="width: 85%; font-size: 1.2rem;" aria-valuenow="85" aria-valuemin="0" aria-valuemax="100">
+                                    85/100 - Excellent
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Key metrics -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <div class="stat">
+                                    <div class="stat-title">Mensualité</div>
+                                    <div class="stat-value">1 419€</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat">
+                                    <div class="stat-title">Taux d'endettement</div>
+                                    <div class="stat-value">27,8%</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat">
+                                    <div class="stat-title">Reste à vivre</div>
+                                    <div class="stat-value">1 681€</div>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="stat">
+                                    <div class="stat-title">Coût total</div>
+                                    <div class="stat-value">90 560€</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- IA Explanation -->
+                        <div class="alert alert-info mt-4">
+                            <strong>Explication IA:</strong>
+                            <p>Votre taux d'endettement de 27,8% est excellent et bien en dessous du plafond réglementaire. Votre CDI de 3 ans et votre apport de 30 000€ renforcent significativement votre dossier. Vous avez de très bonnes chances d'obtenir un financement dans les meilleures conditions du marché.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Comparison -->
+        <div class="row row-deck row-cards mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Comparaison des scénarios</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-vcenter">
+                                <thead>
+                                    <tr>
+                                        <th>Scénario</th>
+                                        <th>Mensualité</th>
+                                        <th>Taux</th>
+                                        <th>Score</th>
+                                        <th>Reste à vivre</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="bg-light">
+                                        <td><strong>Prudent</strong></td>
+                                        <td>1 350€</td>
+                                        <td>3,20%</td>
+                                        <td><span class="badge bg-success">85</span></td>
+                                        <td>1 750€</td>
+                                    </tr>
+                                    <tr class="bg-light">
+                                        <td><strong>Équilibré</strong></td>
+                                        <td>1 419€</td>
+                                        <td>3,31%</td>
+                                        <td><span class="badge bg-success">82</span></td>
+                                        <td>1 681€</td>
+                                    </tr>
+                                    <tr>
+                                        <td><strong>Confortable</strong></td>
+                                        <td>1 500€</td>
+                                        <td>3,50%</td>
+                                        <td><span class="badge bg-warning">75</span></td>
+                                        <td>1 600€</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="row row-deck row-cards mt-4">
+            <div class="col-12">
+                <div class="form-footer">
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#emailModal">
+                        📧 Recevoir par email
+                    </button>
+                    <button class="btn btn-secondary">
+                        📄 Télécharger PDF
+                    </button>
+                    <button class="btn btn-ghost-secondary">
+                        🔄 Nouvelle simulation
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Email Modal -->
+<div class="modal modal-blur fade" id="emailModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-header">
+                <h5 class="modal-title">Recevoir les résultats par email</h5>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Votre email</label>
+                    <input type="email" class="form-control" placeholder="vous@exemple.com">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <button type="button" class="btn btn-primary">Envoyer</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

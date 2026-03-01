@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Projet - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <div class="row row-deck row-cards">
+            <div class="col-md-8 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Étape 3/3 - Votre Projet</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="step3-form">
+                            <div class="mb-3">
+                                <label class="form-label">Montant souhaité (€)</label>
+                                <input type="number" class="form-control" name="montant_souhaite" min="1000" step="1000" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Durée du crédit (mois)</label>
+                                <input type="number" class="form-control" name="duree_mois" min="12" max="360" step="12" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label">Apport personnel (€)</label>
+                                <input type="number" class="form-control" name="apport_personnel" min="0" step="1000" required>
+                            </div>
+
+                            <div class="form-footer">
+                                <button type="button" class="btn btn-secondary" onclick="history.back()">← Retour</button>
+                                <button type="submit" class="btn btn-primary">Calculer →</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

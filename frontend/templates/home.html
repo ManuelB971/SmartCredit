@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}Accueil - Smart Crédit{% endblock %}
+
+{% block content %}
+<div class="page-body">
+    <div class="container-xl">
+        <!-- Hero section -->
+        <div class="row row-deck row-cards mt-4">
+            <div class="col-12">
+                <div class="card border-0 bg-primary">
+                    <div class="card-body py-6 position-relative">
+                        <div class="row align-items-center">
+                            <div class="col-md-8">
+                                <h1 class="text-white mb-3">
+                                    Trouvez le meilleur taux pour votre crédit<br>
+                                    en <strong>3 minutes</strong> grâce à l'IA
+                                </h1>
+                                <p class="text-white-75 mb-4">
+                                    Simulation gratuite et sans engagement. Résultats instantanés avec explications personnalisées.
+                                </p>
+                                <a href="/simulation/start/" class="btn btn-white">
+                                    Simuler mon crédit →
+                                </a>
+                            </div>
+                            <div class="col-md-4 text-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler" width="200" height="200" viewBox="0 0 24 24" stroke-width="1" stroke="white" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                                    <polyline points="12 3 20 7.5 20 16.5 12 21 4 16.5 4 7.5 12 3" />
+                                    <line x1="12" y1="12" x2="20" y2="7.5" />
+                                    <line x1="12" y1="12" x2="12" y2="21" />
+                                    <line x1="12" y1="12" x2="4" y2="7.5" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features section -->
+        <div class="row row-deck row-cards mt-4">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">🎓 Crédit Étudiant</h3>
+                        <p class="text-muted mb-3">
+                            Taux de 0,80 % à 2,50 %<br>
+                            Montants jusqu'à 75 000 €<br>
+                            Différé possible
+                        </p>
+                        <a href="/simulation/start/?type=ETUDIANT" class="btn btn-primary">Simuler</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="card-title">🏠 Crédit Immobilier</h3>
+                        <p class="text-muted mb-3">
+                            Taux de 3,20 % à 3,70 %<br>
+                            Durée jusqu'à 25 ans<br>
+                            Taux d'endettement max 35 %
+                        </p>
+                        <a href="/simulation/start/?type=IMMOBILIER" class="btn btn-primary">Simuler</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <div class="row row-deck row-cards mt-4">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Comment ça marche ?</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="mb-3">
+                                    <span class="badge badge-lg badge-primary">1</span>
+                                </div>
+                                <h4>Votre Profil</h4>
+                                <p class="text-muted">Répondez à 5 questions sur votre situation</p>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="mb-3">
+                                    <span class="badge badge-lg badge-primary">2</span>
+                                </div>
+                                <h4>Vos Revenus</h4>
+                                <p class="text-muted">Dites-nous vos revenus et charges</p>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="mb-3">
+                                    <span class="badge badge-lg badge-primary">3</span>
+                                </div>
+                                <h4>Votre Projet</h4>
+                                <p class="text-muted">Précisez le montant et la durée souhaités</p>
+                            </div>
+                            <div class="col-md-3 text-center mb-3">
+                                <div class="mb-3">
+                                    <span class="badge badge-lg badge-primary">✓</span>
+                                </div>
+                                <h4>Résultats IA</h4>
+                                <p class="text-muted">Obtenez vos résultats avec explication</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

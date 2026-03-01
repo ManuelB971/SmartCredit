@@ -1,0 +1,74 @@
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:16-alpine
+    container_name: smart-credit-db
+    environment:
+      POSTGRES_DB: smart_credit_db
+      POSTGRES_USER: smart_credit_user
+      POSTGRES_PASSWORD: devpassword
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U smart_credit_user -d smart_credit_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis Cache (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: smart-credit-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Django Application
+  web:
+    build: .
+    container_name: smart-credit-web
+    environment:
+      DEBUG: "True"
+      DJANGO_SETTINGS_MODULE: smart_credit.settings.development
+      SECRET_KEY: "dev-secret-key-change-in-production"
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: smart_credit_db
+      DB_USER: smart_credit_user
+      DB_PASSWORD: devpassword
+      REDIS_URL: redis://redis:6379/0
+      ALLOWED_HOSTS: "localhost,127.0.0.1,web"
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # pgAdmin for Database Management
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: smart-credit-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@smartcredit.dev
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
+
+networks:
+  default:
+    name: smart-credit-network
