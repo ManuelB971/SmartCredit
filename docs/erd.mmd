@@ -42,7 +42,7 @@ erDiagram
     numeric autres_charges
     varchar type_contrat
     int anciennete_emploi_mois
-    bigint simulation_id FK_UK
+    bigint simulation_id FK
   }
 
   PROJETS_CREDIT {
@@ -51,7 +51,7 @@ erDiagram
     numeric montant_souhaite
     int duree_mois
     numeric apport_personnel
-    bigint simulation_id FK_UK
+    bigint simulation_id FK
   }
 
   BANQUES {
@@ -91,7 +91,7 @@ erDiagram
     text recommandations
     text avertissements
     niveau_langage niveau_langage
-    bigint simulation_id FK_UK
+    bigint simulation_id FK
     timestamptz date_generation
   }
 
