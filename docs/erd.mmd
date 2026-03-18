@@ -1,0 +1,117 @@
+erDiagram
+  UTILISATEURS ||--o{ SIMULATIONS : "possede"
+  SIMULATIONS ||--|| PROFILS_FINANCIERS : "a"
+  SIMULATIONS ||--|| PROJETS_CREDIT : "a"
+  SIMULATIONS ||--o{ RESULTATS_SIMULATIONS : "genere"
+  SIMULATIONS ||--o| EXPLICATIONS_IA : "explique"
+  SIMULATIONS ||--o{ EXPORTS_PDF_EMAIL : "exporte"
+  BANQUES ||--o{ OFFRES_BANCAIRES : "publie"
+  OFFRES_BANCAIRES ||--o{ RESULTATS_SIMULATIONS : "utilisee_par"
+  UTILISATEURS ||--o{ CONSENTEMENTS : "donne"
+
+  UTILISATEURS {
+    bigint id PK
+    varchar nom
+    varchar prenom
+    varchar email UK
+    varchar mot_de_passe_hash
+    timestamptz date_creation
+    timestamptz date_derniere_connexion
+  }
+
+  SIMULATIONS {
+    bigint id PK
+    type_credit type_credit
+    timestamptz date_simulation
+    statut_simulation statut
+    bigint utilisateur_id FK
+    varchar source
+    varchar ip_hash
+  }
+
+  PROFILS_FINANCIERS {
+    bigint id PK
+    int age
+    varchar situation_familiale
+    int nombre_enfants
+    varchar ville
+    numeric revenus_mensuels
+    numeric autres_revenus
+    numeric charges_logement
+    numeric charges_credits
+    numeric autres_charges
+    varchar type_contrat
+    int anciennete_emploi_mois
+    bigint simulation_id FK_UK
+  }
+
+  PROJETS_CREDIT {
+    bigint id PK
+    type_credit type_credit
+    numeric montant_souhaite
+    int duree_mois
+    numeric apport_personnel
+    bigint simulation_id FK_UK
+  }
+
+  BANQUES {
+    bigint id PK
+    varchar nom UK
+    text site_url
+  }
+
+  OFFRES_BANCAIRES {
+    bigint id PK
+    bigint banque_id FK
+    type_credit type_credit
+    int duree_min_mois
+    int duree_max_mois
+    numeric taux_annuel
+    text conditions_particulieres
+    date date_mise_a_jour
+  }
+
+  RESULTATS_SIMULATIONS {
+    bigint id PK
+    numeric mensualite
+    numeric taux_utilise
+    numeric cout_total
+    numeric taux_endettement
+    numeric reste_a_vivre
+    int score_faisabilite
+    scenario_resultat scenario
+    bigint offre_bancaire_id FK
+    bigint simulation_id FK
+    timestamptz date_calcul
+  }
+
+  EXPLICATIONS_IA {
+    bigint id PK
+    text texte_explication
+    text recommandations
+    text avertissements
+    niveau_langage niveau_langage
+    bigint simulation_id FK_UK
+    timestamptz date_generation
+  }
+
+  EXPORTS_PDF_EMAIL {
+    bigint id PK
+    bigint simulation_id FK
+    varchar email_destinataire
+    etat_export etat
+    timestamptz date_demande
+    timestamptz date_envoi
+    text erreur
+  }
+
+  CONSENTEMENTS {
+    bigint id PK
+    bigint utilisateur_id FK
+    varchar email
+    type_consentement type
+    boolean valeur
+    timestamptz date_consentement
+    varchar source
+  }
+
