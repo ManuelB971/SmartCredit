@@ -1,0 +1,41 @@
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-smartcredit}
+      POSTGRES_USER: ${POSTGRES_USER:-smartcredit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartcredit}
+    ports:
+      - "5666:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-smartcredit} -d ${POSTGRES_DB:-smartcredit}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-smartcredit}
+      POSTGRES_USER: ${POSTGRES_USER:-smartcredit}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-smartcredit}
+      POSTGRES_HOST: ${POSTGRES_HOST:-db}
+      POSTGRES_PORT: ${POSTGRES_PORT:-5432}
+      DJANGO_SECRET_KEY: ${DJANGO_SECRET_KEY:-change-me}
+      DJANGO_DEBUG: ${DJANGO_DEBUG:-1}
+      DJANGO_ALLOWED_HOSTS: ${DJANGO_ALLOWED_HOSTS:-localhost,127.0.0.1}
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8001:8000"
+    volumes:
+      - ./backend:/app
+    command: python manage.py runserver 0.0.0.0:8000
+
+volumes:
+  pgdata:
+
