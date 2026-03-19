@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ba1a1a",
+              "surface": "#fcf8f8",
+              "on-error-container": "#93000a",
+              "surface-container": "#f1edec",
+              "primary-fixed": "#95f4da",
+              "on-error": "#ffffff",
+              "surface-dim": "#dcd9d9",
+              "secondary": "#a04025",
+              "outline-variant": "#bdc9c4",
+              "on-tertiary-container": "#fdf7ec",
+              "surface-container-highest": "#e5e2e1",
+              "tertiary-fixed": "#e8e2d8",
+              "secondary-container": "#fe8766",
+              "on-tertiary": "#ffffff",
+              "primary-fixed-dim": "#78d8bf",
+              "on-surface": "#1c1b1b",
+              "on-primary": "#ffffff",
+              "tertiary": "#5c5951",
+              "surface-container-high": "#ebe7e7",
+              "surface-variant": "#e5e2e1",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed": "#3b0900",
+              "inverse-primary": "#78d8bf",
+              "on-primary-fixed-variant": "#005142",
+              "on-primary-container": "#dbfff3",
+              "on-background": "#1c1b1b",
+              "inverse-surface": "#313030",
+              "outline": "#6e7a75",
+              "tertiary-fixed-dim": "#cbc6bc",
+              "surface-tint": "#006b59",
+              "inverse-on-surface": "#f3f0ef",
+              "secondary-fixed-dim": "#ffb5a0",
+              "surface-bright": "#fcf8f8",
+              "primary": "#006554",
+              "on-secondary": "#ffffff",
+              "surface-container-low": "#f6f3f2",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-container": "#732007",
+              "on-primary-fixed": "#002019",
+              "on-surface-variant": "#3e4945",
+              "on-tertiary-fixed": "#1d1b15",
+              "secondary-fixed": "#ffdbd1",
+              "tertiary-container": "#757169",
+              "on-secondary-fixed-variant": "#802910",
+              "background": "#fcf8f8",
+              "primary-container": "#0c806b",
+              "on-tertiary-fixed-variant": "#4a463f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      input[type='range'] {
+        -webkit-appearance: none;
+        appearance: none;
+        background: transparent;
+        cursor: pointer;
+      }
+      input[type='range']::-webkit-slider-runnable-track {
+        background: #bdc9c433;
+        height: 8px;
+        border-radius: 4px;
+      }
+      input[type='range']::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        margin-top: -12px;
+        background-color: #006554;
+        height: 32px;
+        width: 32px;
+        border-radius: 50%;
+        border: 4px solid #ffffff;
+        box-shadow: 0 4px 12px rgba(0, 101, 84, 0.15);
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col">
+<!-- TopAppBar Shell -->
+<header class="bg-[#fcf8f8] dark:bg-[#1c1b1b] docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#006554] dark:text-[#0c806b]" style="font-variation-settings: 'FILL' 0;">account_balance</span>
+<h1 class="text-xl font-bold text-[#006554] dark:text-[#0c806b] tracking-tighter">Smart Crédit</h1>
+</div>
+<button class="text-[#3e4945] dark:text-[#bdc9c4] font-['Inter'] font-semibold tracking-tight hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors px-4 py-2 rounded-lg">
+                Connexion
+            </button>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center px-6 py-12 max-w-4xl mx-auto w-full">
+<!-- Step Indicator -->
+<div class="w-full flex justify-between items-end mb-12">
+<div class="space-y-1">
+<p class="text-sm font-medium text-primary uppercase tracking-widest">Étape 3 sur 5</p>
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface">Votre projet</h2>
+</div>
+<div class="flex gap-1.5 pb-2">
+<div class="h-1.5 w-8 rounded-full bg-primary-container opacity-20"></div>
+<div class="h-1.5 w-8 rounded-full bg-primary-container opacity-20"></div>
+<div class="h-1.5 w-16 rounded-full bg-primary"></div>
+<div class="h-1.5 w-8 rounded-full bg-surface-container-highest"></div>
+<div class="h-1.5 w-8 rounded-full bg-surface-container-highest"></div>
+</div>
+</div>
+<!-- Project Type Toggle (Editorial Style) -->
+<div class="w-full bg-surface-container-low p-2 rounded-xl flex mb-12">
+<button class="flex-1 py-4 text-center rounded-lg bg-surface-container-lowest text-primary font-bold shadow-sm transition-all">
+                Prêt Immobilier
+            </button>
+<button class="flex-1 py-4 text-center rounded-lg text-on-surface-variant font-medium hover:bg-surface-container-high transition-colors">
+                Prêt Étudiant
+            </button>
+</div>
+<!-- Main Configuration Canvas -->
+<div class="w-full space-y-16">
+<!-- Amount Section -->
+<section class="space-y-8">
+<div class="flex justify-between items-end">
+<label class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Montant du prêt</label>
+<div class="text-right">
+<span class="text-5xl font-extrabold tracking-tighter text-primary">245 000</span>
+<span class="text-2xl font-bold text-primary ml-1">€</span>
+</div>
+</div>
+<div class="relative py-4">
+<input class="w-full h-2 rounded-full" max="1000000" min="50000" step="5000" type="range" value="245000"/>
+<div class="flex justify-between mt-4 text-xs font-medium text-outline">
+<span>50 000 €</span>
+<span>1 000 000 €</span>
+</div>
+</div>
+</section>
+<!-- Grid for Secondary Controls (Asymmetric Layout) -->
+<div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+<!-- Duration Control -->
+<div class="md:col-span-7 space-y-6">
+<label class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Durée du crédit</label>
+<div class="flex gap-4">
+<button class="flex-1 py-6 px-4 rounded-xl border-2 border-primary bg-surface-container-lowest flex flex-col items-center gap-2 transition-all">
+<span class="text-2xl font-extrabold text-primary">15</span>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Ans</span>
+</button>
+<button class="flex-1 py-6 px-4 rounded-xl border-2 border-transparent bg-surface-container-low flex flex-col items-center gap-2 hover:bg-surface-container-high transition-all">
+<span class="text-2xl font-extrabold text-on-surface">20</span>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Ans</span>
+</button>
+<button class="flex-1 py-6 px-4 rounded-xl border-2 border-transparent bg-surface-container-low flex flex-col items-center gap-2 hover:bg-surface-container-high transition-all">
+<span class="text-2xl font-extrabold text-on-surface">25</span>
+<span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Ans</span>
+</button>
+</div>
+</div>
+<!-- Personal Contribution (Apport) -->
+<div class="md:col-span-5 space-y-6">
+<label class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Votre apport personnel</label>
+<div class="relative group">
+<div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+<span class="text-primary font-bold text-xl">€</span>
+</div>
+<input class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-8 pl-14 pr-6 text-2xl font-bold text-on-surface transition-all" type="text" value="35 000"/>
+</div>
+<p class="text-xs text-on-surface-variant/70 italic px-2">Recommandé : minimum 10% du montant total</p>
+</div>
+</div>
+<!-- Visual Insight (Smart Gauge Placeholder) -->
+<div class="bg-primary/5 p-8 rounded-2xl border border-primary/10 flex items-center gap-6">
+<div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center shrink-0">
+<span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">insights</span>
+</div>
+<div>
+<h4 class="font-bold text-primary mb-1">Analyse de faisabilité</h4>
+<p class="text-sm text-on-surface-variant leading-relaxed">Basé sur vos revenus de l'étape précédente, votre taux d'endettement estimé serait de <span class="font-bold text-primary">28.4%</span>. C'est un excellent profil.</p>
+</div>
+</div>
+</div>
+</main>
+<!-- Spacer for fixed bottom nav -->
+<div class="h-32"></div>
+<!-- BottomNavBar Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pb-safe bg-white/80 dark:bg-[#1c1b1b]/80 backdrop-blur-xl shadow-[0_-12px_32px_rgba(0,101,84,0.06)] rounded-t-2xl border-t border-[#bdc9c4]/20">
+<button class="flex items-center justify-center text-[#3e4945] dark:text-[#bdc9c4] px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] duration-200">
+<span class="material-symbols-outlined mr-2">arrow_back</span>
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Précédent</span>
+</button>
+<button class="flex items-center justify-center bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] duration-200">
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Suivant</span>
+<span class="material-symbols-outlined ml-2">arrow_forward</span>
+</button>
+</nav>
+</body></html>

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Smart Crédit - Analyse en cours</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface": "#fcf8f8",
+              "secondary-container": "#fe8766",
+              "on-tertiary-container": "#fdf7ec",
+              "on-secondary": "#ffffff",
+              "background": "#fcf8f8",
+              "on-surface": "#1c1b1b",
+              "outline": "#6e7a75",
+              "tertiary-container": "#757169",
+              "secondary": "#a04025",
+              "on-error-container": "#93000a",
+              "primary-fixed": "#95f4da",
+              "secondary-fixed-dim": "#ffb5a0",
+              "on-primary": "#ffffff",
+              "inverse-surface": "#313030",
+              "surface-container-low": "#f6f3f2",
+              "surface-container-highest": "#e5e2e1",
+              "surface-container-lowest": "#ffffff",
+              "on-tertiary-fixed-variant": "#4a463f",
+              "primary-container": "#0c806b",
+              "on-primary-fixed-variant": "#005142",
+              "on-background": "#1c1b1b",
+              "on-secondary-container": "#732007",
+              "on-error": "#ffffff",
+              "primary": "#006554",
+              "on-surface-variant": "#3e4945",
+              "on-secondary-fixed-variant": "#802910",
+              "surface-dim": "#dcd9d9",
+              "primary-fixed-dim": "#78d8bf",
+              "surface-bright": "#fcf8f8",
+              "inverse-on-surface": "#f3f0ef",
+              "surface-tint": "#006b59",
+              "on-primary-fixed": "#002019",
+              "error-container": "#ffdad6",
+              "tertiary-fixed-dim": "#cbc6bc",
+              "secondary-fixed": "#ffdbd1",
+              "inverse-primary": "#78d8bf",
+              "surface-variant": "#e5e2e1",
+              "outline-variant": "#bdc9c4",
+              "on-tertiary-fixed": "#1d1b15",
+              "on-primary-container": "#dbfff3",
+              "error": "#ba1a1a",
+              "tertiary": "#5c5951",
+              "on-secondary-fixed": "#3b0900",
+              "tertiary-fixed": "#e8e2d8",
+              "surface-container": "#f1edec",
+              "surface-container-high": "#ebe7e7",
+              "on-tertiary": "#ffffff"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .loader-pulse {
+            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: .7; transform: scale(1.05); }
+        }
+        .scan-line {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #0c806b, transparent);
+            position: absolute;
+            width: 100%;
+            top: 0;
+            animation: scan 3s linear infinite;
+        }
+        @keyframes scan {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body antialiased min-h-screen flex flex-col">
+<!-- TopAppBar from JSON -->
+<header class="bg-[#fcf8f8] dark:bg-[#1c1b1b] docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#006554] dark:text-[#0c806b]" data-icon="account_balance">account_balance</span>
+<h1 class="font-['Inter'] font-semibold tracking-tight text-xl font-bold text-[#006554] dark:text-[#0c806b] tracking-tighter">Smart Crédit</h1>
+</div>
+<button class="text-[#3e4945] dark:text-[#bdc9c4] font-['Inter'] font-semibold transition-colors hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] px-3 py-1 rounded-lg">Connexion</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-center px-8 py-12 space-y-12">
+<!-- AI Visual Component: The Smart Gauge & Scanner -->
+<div class="relative w-48 h-48 flex items-center justify-center">
+<!-- Glassmorphism Container for the Icon -->
+<div class="absolute inset-0 bg-surface-container-lowest/80 backdrop-blur-xl rounded-full border border-outline-variant/20 shadow-lg flex items-center justify-center overflow-hidden">
+<div class="scan-line"></div>
+<div class="loader-pulse">
+<span class="material-symbols-outlined text-primary text-7xl" data-icon="psychology" data-weight="fill" style="font-variation-settings: 'FILL' 1;">psychology</span>
+</div>
+</div>
+<!-- Radial Decorative Element -->
+<div class="absolute -inset-4 border-2 border-dashed border-primary/20 rounded-full animate-[spin_20s_linear_infinite]"></div>
+</div>
+<!-- Headline & Subtext -->
+<div class="text-center space-y-4 max-w-sm">
+<h2 class="text-2xl font-headline font-bold tracking-tight text-on-surface">L'IA Smart Crédit analyse votre dossier...</h2>
+<p class="text-on-surface-variant leading-relaxed">Nous comparons les offres de 5 grandes banques en temps réel.</p>
+</div>
+<!-- Progress List: Editorial Bento Style -->
+<div class="w-full max-w-sm space-y-3">
+<!-- Completed Task -->
+<div class="flex items-center gap-4 p-4 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-medium text-on-surface">Profil validé</span>
+</div>
+<!-- Completed Task -->
+<div class="flex items-center gap-4 p-4 rounded-xl bg-surface-container-lowest shadow-sm">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+</div>
+<span class="font-medium text-on-surface">Analyse des revenus terminée</span>
+</div>
+<!-- Active Task -->
+<div class="flex items-center gap-4 p-4 rounded-xl bg-primary text-white shadow-md">
+<div class="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl animate-spin" data-icon="sync">sync</span>
+</div>
+<span class="font-bold tracking-tight">Comparaison bancaire en cours...</span>
+</div>
+</div>
+<!-- Custom Smart Gauge -->
+<div class="w-full max-w-xs space-y-2">
+<div class="flex justify-between text-xs font-label uppercase tracking-widest text-on-surface-variant">
+<span>Analyse</span>
+<span>84%</span>
+</div>
+<div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-gradient-to-r from-primary to-primary-container w-[84%] rounded-full"></div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar from JSON -->
+<!-- Suppression logic: Since this is a transition screen, we only show specific navigation if needed, 
+         but we include the requested shell layout for the prompt's integrity. -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pb-safe bg-white/80 dark:bg-[#1c1b1b]/80 backdrop-blur-xl rounded-t-2xl border-t border-[#bdc9c4]/20 shadow-[0_-12px_32px_rgba(0,101,84,0.06)]">
+<button class="flex items-center justify-center text-[#3e4945] dark:text-[#bdc9c4] px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] font-['Inter'] text-sm font-medium uppercase tracking-wider">
+<span class="material-symbols-outlined mr-2" data-icon="arrow_back">arrow_back</span>
+            Précédent
+        </button>
+<button class="flex items-center justify-center bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] font-['Inter'] text-sm font-medium uppercase tracking-wider">
+            Suivant
+            <span class="material-symbols-outlined ml-2" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</nav>
+<!-- Decorative background elements -->
+<div class="fixed top-20 -right-20 w-64 h-64 bg-primary/5 blur-[100px] rounded-full -z-10"></div>
+<div class="fixed bottom-40 -left-20 w-80 h-80 bg-secondary-container/5 blur-[120px] rounded-full -z-10"></div>
+</body></html>

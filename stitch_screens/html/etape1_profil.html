@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Smart Crédit - Étape 1</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ba1a1a",
+              "surface": "#fcf8f8",
+              "on-error-container": "#93000a",
+              "surface-container": "#f1edec",
+              "primary-fixed": "#95f4da",
+              "on-error": "#ffffff",
+              "surface-dim": "#dcd9d9",
+              "secondary": "#a04025",
+              "outline-variant": "#bdc9c4",
+              "on-tertiary-container": "#fdf7ec",
+              "surface-container-highest": "#e5e2e1",
+              "tertiary-fixed": "#e8e2d8",
+              "secondary-container": "#fe8766",
+              "on-tertiary": "#ffffff",
+              "primary-fixed-dim": "#78d8bf",
+              "on-surface": "#1c1b1b",
+              "on-primary": "#ffffff",
+              "tertiary": "#5c5951",
+              "surface-container-high": "#ebe7e7",
+              "surface-variant": "#e5e2e1",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed": "#3b0900",
+              "inverse-primary": "#78d8bf",
+              "on-primary-fixed-variant": "#005142",
+              "on-primary-container": "#dbfff3",
+              "on-background": "#1c1b1b",
+              "inverse-surface": "#313030",
+              "outline": "#6e7a75",
+              "tertiary-fixed-dim": "#cbc6bc",
+              "surface-tint": "#006b59",
+              "inverse-on-surface": "#f3f0ef",
+              "secondary-fixed-dim": "#ffb5a0",
+              "surface-bright": "#fcf8f8",
+              "primary": "#006554",
+              "on-secondary": "#ffffff",
+              "surface-container-low": "#f6f3f2",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-container": "#732007",
+              "on-primary-fixed": "#002019",
+              "on-surface-variant": "#3e4945",
+              "on-tertiary-fixed": "#1d1b15",
+              "secondary-fixed": "#ffdbd1",
+              "tertiary-container": "#757169",
+              "on-secondary-fixed-variant": "#802910",
+              "background": "#fcf8f8",
+              "primary-container": "#0c806b",
+              "on-tertiary-fixed-variant": "#4a463f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex flex-col">
+<!-- TopAppBar from Shared Components -->
+<header class="bg-[#fcf8f8] dark:bg-[#1c1b1b] docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#006554] dark:text-[#0c806b]" data-icon="account_balance">account_balance</span>
+<h1 class="font-['Inter'] font-semibold tracking-tight text-xl font-bold text-[#006554] dark:text-[#0c806b] tracking-tighter">Smart Crédit</h1>
+</div>
+<button class="text-[#3e4945] dark:text-[#bdc9c4] hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors active:scale-95 duration-200 px-4 py-2 rounded-lg font-medium">Connexion</button>
+</div>
+</header>
+<main class="flex-grow flex flex-col items-center justify-start px-6 pt-8 pb-32 max-w-2xl mx-auto w-full">
+<!-- Editorial Progress Bar -->
+<div class="w-full mb-12">
+<div class="flex justify-between items-end mb-3">
+<span class="text-sm font-medium text-primary tracking-wide">Étape 1 sur 5</span>
+<span class="text-xs text-on-surface-variant font-label">20% complété</span>
+</div>
+<div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full w-1/5"></div>
+</div>
+</div>
+<!-- Section Heading -->
+<div class="w-full mb-10">
+<h2 class="text-4xl font-extrabold tracking-tight text-on-surface mb-2">Votre profil</h2>
+<p class="text-on-surface-variant text-lg">Commençons par faire connaissance pour personnaliser votre offre.</p>
+</div>
+<!-- Wizard Form -->
+<div class="w-full space-y-12">
+<!-- Age Field -->
+<section class="space-y-4">
+<label class="block text-sm font-semibold uppercase tracking-wider text-on-surface-variant" for="age">Quel est votre âge ?</label>
+<div class="relative">
+<input class="w-full h-14 bg-surface-container-lowest border-none rounded-xl px-6 text-xl font-medium focus:ring-2 focus:ring-primary transition-all shadow-sm" id="age" placeholder="Ex: 35" type="number"/>
+<span class="absolute right-6 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">ans</span>
+</div>
+</section>
+<!-- Family Situation -->
+<section class="space-y-4">
+<label class="block text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Situation familiale</label>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="family" type="radio"/>
+<div class="p-5 rounded-xl bg-surface-container-low border-2 border-transparent peer-checked:border-primary peer-checked:bg-surface-container-lowest transition-all group-hover:bg-surface-container-highest flex flex-col items-center text-center gap-2">
+<span class="material-symbols-outlined text-2xl text-primary" data-icon="person">person</span>
+<span class="font-medium">Célibataire</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="family" type="radio"/>
+<div class="p-5 rounded-xl bg-surface-container-low border-2 border-transparent peer-checked:border-primary peer-checked:bg-surface-container-lowest transition-all group-hover:bg-surface-container-highest flex flex-col items-center text-center gap-2">
+<span class="material-symbols-outlined text-2xl text-primary" data-icon="favorite">favorite</span>
+<span class="font-medium">Marié(e)</span>
+</div>
+</label>
+<label class="relative cursor-pointer group">
+<input class="peer sr-only" name="family" type="radio"/>
+<div class="p-5 rounded-xl bg-surface-container-low border-2 border-transparent peer-checked:border-primary peer-checked:bg-surface-container-lowest transition-all group-hover:bg-surface-container-highest flex flex-col items-center text-center gap-2">
+<span class="material-symbols-outlined text-2xl text-primary" data-icon="handshake">handshake</span>
+<span class="font-medium">Pacsé(e)</span>
+</div>
+</label>
+</div>
+</section>
+<!-- Children Stepper -->
+<section class="flex items-center justify-between p-6 rounded-2xl bg-surface-container-low">
+<div>
+<label class="block text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Nombre d'enfants</label>
+<p class="text-xs text-on-surface-variant mt-1">À charge fiscalement</p>
+</div>
+<div class="flex items-center bg-surface-container-lowest rounded-full p-1 border border-outline-variant/20 shadow-sm">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-primary active:scale-90">
+<span class="material-symbols-outlined" data-icon="remove">remove</span>
+</button>
+<span class="w-12 text-center text-xl font-bold">0</span>
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-surface-container-low transition-colors text-primary active:scale-90">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+</button>
+</div>
+</section>
+<!-- City Autocomplete -->
+<section class="space-y-4">
+<label class="block text-sm font-semibold uppercase tracking-wider text-on-surface-variant" for="city">Ville de résidence</label>
+<div class="relative group">
+<span class="absolute left-5 top-1/2 -translate-y-1/2 material-symbols-outlined text-on-surface-variant group-focus-within:text-primary" data-icon="location_on">location_on</span>
+<input class="w-full h-14 bg-surface-container-lowest border-none rounded-xl pl-14 pr-6 text-lg font-medium focus:ring-2 focus:ring-primary transition-all shadow-sm" id="city" placeholder="Ex: Paris, Lyon..." type="text"/>
+</div>
+</section>
+</div>
+</main>
+<!-- BottomNavBar from Shared Components (Modified for Wizard Logic) -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pb-safe bg-white/80 dark:bg-[#1c1b1b]/80 backdrop-blur-xl shadow-[0_-12px_32px_rgba(0,101,84,0.06)] border-t border-[#bdc9c4]/20">
+<button class="flex items-center justify-center text-[#3e4945] dark:text-[#bdc9c4] px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98]">
+<span class="material-symbols-outlined mr-2" data-icon="arrow_back">arrow_back</span>
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Précédent</span>
+</button>
+<button class="flex items-center justify-center bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98]">
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Suivant</span>
+<span class="material-symbols-outlined ml-2" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</nav>
+</body></html>

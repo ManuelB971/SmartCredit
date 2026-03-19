@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+
+<html class="light" lang="fr"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "error": "#ba1a1a",
+              "surface": "#fcf8f8",
+              "on-error-container": "#93000a",
+              "surface-container": "#f1edec",
+              "primary-fixed": "#95f4da",
+              "on-error": "#ffffff",
+              "surface-dim": "#dcd9d9",
+              "secondary": "#a04025",
+              "outline-variant": "#bdc9c4",
+              "on-tertiary-container": "#fdf7ec",
+              "surface-container-highest": "#e5e2e1",
+              "tertiary-fixed": "#e8e2d8",
+              "secondary-container": "#fe8766",
+              "on-tertiary": "#ffffff",
+              "primary-fixed-dim": "#78d8bf",
+              "on-surface": "#1c1b1b",
+              "on-primary": "#ffffff",
+              "tertiary": "#5c5951",
+              "surface-container-high": "#ebe7e7",
+              "surface-variant": "#e5e2e1",
+              "error-container": "#ffdad6",
+              "on-secondary-fixed": "#3b0900",
+              "inverse-primary": "#78d8bf",
+              "on-primary-fixed-variant": "#005142",
+              "on-primary-container": "#dbfff3",
+              "on-background": "#1c1b1b",
+              "inverse-surface": "#313030",
+              "outline": "#6e7a75",
+              "tertiary-fixed-dim": "#cbc6bc",
+              "surface-tint": "#006b59",
+              "inverse-on-surface": "#f3f0ef",
+              "secondary-fixed-dim": "#ffb5a0",
+              "surface-bright": "#fcf8f8",
+              "primary": "#006554",
+              "on-secondary": "#ffffff",
+              "surface-container-low": "#f6f3f2",
+              "surface-container-lowest": "#ffffff",
+              "on-secondary-container": "#732007",
+              "on-primary-fixed": "#002019",
+              "on-surface-variant": "#3e4945",
+              "on-tertiary-fixed": "#1d1b15",
+              "secondary-fixed": "#ffdbd1",
+              "tertiary-container": "#757169",
+              "on-secondary-fixed-variant": "#802910",
+              "background": "#fcf8f8",
+              "primary-container": "#0c806b",
+              "on-tertiary-fixed-variant": "#4a463f"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(24px);
+        }
+        .asymmetric-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 2rem;
+        }
+        @media (max-width: 1024px) {
+            .asymmetric-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface font-body text-on-surface min-h-screen">
+<!-- TopAppBar -->
+<header class="bg-[#fcf8f8] dark:bg-[#1c1b1b] docked full-width top-0 z-50">
+<div class="flex justify-between items-center w-full px-6 py-4 max-w-7xl mx-auto">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#006554] dark:text-[#0c806b]" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+<h1 class="font-['Inter'] font-semibold tracking-tight text-xl font-bold text-[#006554] dark:text-[#0c806b] tracking-tighter">Smart Crédit</h1>
+</div>
+<div class="hidden md:flex gap-8">
+<a class="text-[#006554] dark:text-[#0c806b] font-bold" href="#">Tableau de bord</a>
+<a class="text-[#3e4945] dark:text-[#bdc9c4] hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors rounded-lg px-3 py-1" href="#">Simulations</a>
+<a class="text-[#3e4945] dark:text-[#bdc9c4] hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors rounded-lg px-3 py-1" href="#">Mon Profil</a>
+</div>
+<button class="bg-gradient-to-br from-[#006554] to-[#0c806b] text-white px-6 py-2 rounded-lg font-label text-sm font-medium uppercase tracking-wider active:scale-95 duration-200">
+                Connexion
+            </button>
+</div>
+</header>
+<main class="max-w-7xl mx-auto px-6 py-12 pb-32">
+<!-- Hero: Best Rate & Headline -->
+<section class="mb-12">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
+<div class="space-y-2">
+<span class="inline-block px-3 py-1 bg-primary-container/10 text-primary font-label text-xs font-bold tracking-widest uppercase rounded-full">Analyse IA terminée</span>
+<h2 class="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-on-surface">Vos opportunités de financement.</h2>
+<p class="text-on-surface-variant max-w-xl text-lg">Basé sur votre profil financier, nous avons identifié les meilleures options pour votre projet immobilier.</p>
+</div>
+<!-- Best Rate Highlight Card -->
+<div class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_32px_rgba(0,101,84,0.06)] border border-outline-variant/20 flex items-center gap-6 min-w-[320px]">
+<div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
+<span class="material-symbols-outlined text-blue-600 text-3xl">trending_down</span>
+</div>
+<div>
+<p class="text-xs font-label text-on-surface-variant font-bold uppercase tracking-tighter mb-1">Meilleur Taux Trouvé</p>
+<p class="text-3xl font-headline font-extrabold text-blue-600 tracking-tighter leading-none">3,31 %</p>
+<p class="text-sm font-medium text-on-surface">chez <span class="font-bold">Boursorama</span> sur 20 ans</p>
+</div>
+</div>
+</div>
+</section>
+<div class="asymmetric-grid">
+<!-- Left Column: Scenarios -->
+<div class="space-y-8">
+<h3 class="text-xl font-headline font-bold text-on-surface flex items-center gap-2">
+                    Scénarios de financement
+                    <span class="h-px flex-1 bg-outline-variant/20 ml-4"></span>
+</h3>
+<div class="grid grid-cols-1 gap-4">
+<!-- Scenario: Prudent -->
+<div class="bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-6 rounded-xl border border-transparent hover:border-outline-variant/20 group">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-lg font-bold">Scénario Prudent</h4>
+<p class="text-sm text-on-surface-variant">Remboursement accéléré sur 15 ans</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">timer</span>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Mensualité</p>
+<p class="text-2xl font-headline font-extrabold">2 145 €</p>
+</div>
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Coût Total</p>
+<p class="text-2xl font-headline font-extrabold">48 200 €</p>
+</div>
+</div>
+</div>
+<!-- Scenario: Equilibre (Recommended) -->
+<div class="relative bg-surface-container-lowest p-6 rounded-xl border-2 border-primary shadow-[0_12px_48px_rgba(0,101,84,0.12)]">
+<div class="absolute -top-3 right-6 bg-primary text-white px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
+<span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">star</span>
+                            RECOMMANDÉ
+                        </div>
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-xl font-bold text-primary">Scénario Équilibré</h4>
+<p class="text-sm text-on-surface-variant">Le meilleur compromis sur 20 ans</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl">balance</span>
+</div>
+<div class="grid grid-cols-2 gap-8 mb-6">
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1 text-primary/70">Mensualité</p>
+<p class="text-3xl font-headline font-extrabold text-on-surface">1 785 €</p>
+</div>
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1 text-primary/70">Coût Total</p>
+<p class="text-3xl font-headline font-extrabold text-on-surface">65 400 €</p>
+</div>
+</div>
+<!-- Smart Gauge -->
+<div class="space-y-2">
+<div class="flex justify-between text-xs font-bold text-on-surface-variant">
+<span>Remboursement Intérêts / Capital</span>
+<span>21% / 79%</span>
+</div>
+<div class="h-2 w-full bg-primary-fixed-dim rounded-full overflow-hidden flex">
+<div class="h-full bg-primary" style="width: 79%;"></div>
+</div>
+</div>
+</div>
+<!-- Scenario: Confort -->
+<div class="bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-6 rounded-xl border border-transparent hover:border-outline-variant/20 group">
+<div class="flex justify-between items-start mb-6">
+<div>
+<h4 class="text-lg font-bold">Scénario Confort</h4>
+<p class="text-sm text-on-surface-variant">Souplesse maximale sur 25 ans</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">spa</span>
+</div>
+<div class="grid grid-cols-2 gap-8">
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Mensualité</p>
+<p class="text-2xl font-headline font-extrabold">1 420 €</p>
+</div>
+<div>
+<p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Coût Total</p>
+<p class="text-2xl font-headline font-extrabold">88 900 €</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Right Column: AI Analysis -->
+<div class="space-y-8">
+<!-- AI Score Card -->
+<div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant/10 relative overflow-hidden">
+<div class="absolute top-0 right-0 p-8 opacity-5">
+<span class="material-symbols-outlined text-9xl">verified</span>
+</div>
+<div class="flex flex-col items-center text-center">
+<h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-8">Score de Financement IA</h3>
+<!-- Circular Progress Container -->
+<div class="relative w-48 h-48 mb-6">
+<svg class="w-full h-full" viewbox="0 0 100 100">
+<circle class="text-surface-container-highest stroke-current" cx="50" cy="50" fill="transparent" r="42" stroke-width="8"></circle>
+<circle class="text-primary stroke-current" cx="50" cy="50" fill="transparent" r="42" stroke-dasharray="264" stroke-dashoffset="39" stroke-linecap="round" stroke-width="8" transform="rotate(-90 50 50)"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-5xl font-headline font-black text-on-surface">85</span>
+<span class="text-sm font-bold text-on-surface-variant uppercase">Sur 100</span>
+</div>
+</div>
+<div class="bg-primary/10 text-primary px-4 py-2 rounded-full font-bold flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+                            Dossier solide
+                        </div>
+<p class="text-sm text-on-surface-variant">Votre profil présente un risque faible pour les organismes bancaires traditionnels.</p>
+</div>
+</div>
+<!-- AI Explanation Box -->
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/20 space-y-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-white">smart_toy</span>
+</div>
+<h4 class="font-bold">L'avis de Smart AI</h4>
+</div>
+<div class="space-y-4 text-on-surface-variant leading-relaxed">
+<p>Votre taux d'endettement actuel est calculé à <strong class="text-on-surface">28%</strong>, ce qui est en dessous du seuil critique de 35%.</p>
+<p>L'apport personnel de <strong class="text-on-surface">15%</strong> sécurise votre position et vous permet de négocier des options d'assurance emprunteur plus compétitives.</p>
+<div class="p-4 bg-surface-container-low rounded-lg border-l-4 border-primary italic text-sm">
+                            "Privilégiez le scénario sur 20 ans pour conserver une épargne résiduelle de précaution tout en bénéficiant d'un coût de crédit optimisé."
+                        </div>
+</div>
+</div>
+<!-- Action Bar (Floating Logic) -->
+<div class="flex flex-col gap-3">
+<button class="w-full bg-gradient-to-br from-[#006554] to-[#0c806b] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 duration-200">
+<span class="material-symbols-outlined">mail</span>
+                        Recevoir par email
+                    </button>
+<button class="w-full bg-surface-container-highest text-on-surface py-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 duration-200">
+<span class="material-symbols-outlined">edit</span>
+                        Modifier simulation
+                    </button>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pb-safe bg-white/80 dark:bg-[#1c1b1b]/80 backdrop-blur-xl shadow-[0_-12px_32px_rgba(0,101,84,0.06)] border-t border-[#bdc9c4]/20">
+<button class="flex items-center justify-center text-[#3e4945] dark:text-[#bdc9c4] px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] transition-transform">
+<span class="material-symbols-outlined mr-2">arrow_back</span>
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Précédent</span>
+</button>
+<button class="flex items-center justify-center bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] transition-transform">
+<span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Suivant</span>
+<span class="material-symbols-outlined ml-2">arrow_forward</span>
+</button>
+</nav>
+</body></html>
