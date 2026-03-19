@@ -1,3 +1,4 @@
+from django.views.decorators.csrf import csrf_exempt
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
@@ -6,8 +7,10 @@ from rest_framework.response import Response
 from django.contrib.auth import login, logout
 
 from .serializers import RegisterSerializer, LoginSerializer, MeSerializer
+from apps.credit.models import Simulation
 
 
+@csrf_exempt
 @extend_schema(
     tags=["Auth"],
     summary="Créer un compte",
@@ -18,7 +21,12 @@ from .serializers import RegisterSerializer, LoginSerializer, MeSerializer
             "Exemple inscription",
             value={"email": "lea@example.com", "password": "motdepassefort", "nom": "Dupont", "prenom": "Léa"},
             request_only=True,
-        )
+        ),
+        OpenApiExample(
+            "Inscription + sauvegarde simulation",
+            value={"email": "lea@example.com", "password": "motdepassefort", "nom": "Dupont", "prenom": "Léa", "simulation_id": 42},
+            request_only=True,
+        ),
     ],
 )
 @api_view(["POST"])
@@ -29,9 +37,10 @@ def register(request):
     email = serializer.validated_data["email"].lower()
     if serializer.Meta.model.objects.filter(email=email).exists():
         return Response({"error": "Email déjà utilisé"}, status=409)
+    simulation_id = serializer.validated_data.pop("simulation_id", None)
     user = serializer.save(email=email)
-    # On garde le login session (optionnel) pour usage navigateur,
-    # mais l'auth principale de l'API est JWT (cf. /api/auth/token/).
+    if simulation_id:
+        Simulation.objects.filter(id=simulation_id, utilisateur__isnull=True).update(utilisateur=user)
     login(request, user)
     return Response(MeSerializer(user).data, status=status.HTTP_201_CREATED)
 

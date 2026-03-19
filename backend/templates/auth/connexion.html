@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Smart Crédit - Connexion{% endblock %}
+{% block content %}
+<main class="flex-grow flex flex-col items-center justify-center px-6 py-16">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center p-3 bg-primary-container/10 rounded-xl mb-6">
+        <span class="material-symbols-outlined text-primary text-3xl">login</span>
+      </div>
+      <h1 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Connexion</h1>
+      <p class="mt-2 text-on-surface-variant">Accédez à votre espace et retrouvez vos simulations.</p>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl shadow-[0_12px_32px_rgba(0,101,84,0.06)] border border-outline-variant/20 p-8">
+      <form id="form-connexion" class="space-y-6">{% csrf_token %}
+        <div class="space-y-2">
+          <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="login-email">Email</label>
+          <input class="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="login-email" name="email" placeholder="vous@exemple.fr" type="email" required/>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="login-password">Mot de passe</label>
+          <input class="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="login-password" name="password" type="password" required/>
+        </div>
+        <div id="login-error" class="hidden text-error text-sm"></div>
+        <button type="submit" id="btn-login" class="w-full h-14 bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg font-label font-bold uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-3">
+          <span class="material-symbols-outlined">login</span>
+          Se connecter
+        </button>
+      </form>
+    </div>
+    <p class="mt-8 text-center text-on-surface-variant">
+      Vous n'avez pas de compte ?
+      <a href="/inscription/" class="text-primary font-bold hover:underline">Créer un compte</a>
+    </p>
+  </div>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}

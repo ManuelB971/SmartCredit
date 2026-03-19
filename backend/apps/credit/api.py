@@ -1,3 +1,4 @@
+import random
 from decimal import Decimal
 
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
@@ -255,17 +256,47 @@ def calculate_simulation(request, simulation_id: int):
     sim.statut = StatutSimulation.TERMINEE
     sim.save(update_fields=["statut"])
 
-    fallback_text = (
-        "Analyse (fallback): "
-        f"taux d'endettement ≈ {te_ref} %, reste à vivre ≈ {rav_ref}. "
-        f"Offre de référence: {offre_ref.banque.nom} à {offre_ref.taux_annuel} % (maj {offre_ref.date_mise_a_jour}). "
-        "Les taux sont indicatifs."
-    )
-    fallback_reco = (
-        "Pistes d'amélioration (fallback): augmenter l'apport, réduire les charges, "
-        "ou ajuster la durée/montant pour diminuer la mensualité."
-    )
-    fallback_warn = "Résultat indicatif, non contractuel. Vérifiez votre situation auprès d'un conseiller."
+    te_val = float(te_ref)
+    rav_val = float(rav_ref)
+    taux_str = str(offre_ref.taux_annuel).replace(".", ",")
+
+    if te_val > 40 and rav_val < 1000:
+        explications = [
+            f"Votre taux d'endettement ({te_val:.1f} %) et votre reste à vivre ({rav_val:.0f} €) rendent le dossier délicat. "
+            f"Parmi les offres comparées, le meilleur taux trouvé est de {taux_str} %. Une consolidation du dossier serait bénéfique.",
+            f"Avec {te_val:.1f} % d'endettement et environ {rav_val:.0f} € de reste à vivre, les banques pourraient être exigeantes. "
+            f"Nous avons identifié des offres à partir de {taux_str} %. Des ajustements sont possibles.",
+        ]
+    elif te_val > 35:
+        explications = [
+            f"Votre taux d'endettement ({te_val:.1f} %) frôle la limite habituelle des 35 %. "
+            f"Reste à vivre : environ {rav_val:.0f} €. Le meilleur taux parmi les offres analysées : {taux_str} %.",
+            f"Dossier à la limite : {te_val:.1f} % d'endettement, reste à vivre {rav_val:.0f} €. "
+            f"Les offres les plus compétitives démarrent à {taux_str} %. Un peu plus d'apport ou une durée plus longue pourrait aider.",
+        ]
+    else:
+        explications = [
+            f"Votre profil est cohérent : taux d'endettement autour de {te_val:.1f} %, reste à vivre d'environ {rav_val:.0f} €. "
+            f"Parmi les offres comparées, nous avons trouvé des taux à partir de {taux_str} %.",
+            f"Les chiffres sont encourageants — endettement à {te_val:.1f} %, reste à vivre ~{rav_val:.0f} €. "
+            f"Votre meilleure option parmi nos partenaires affiche un taux de {taux_str} %. Les taux restent indicatifs.",
+        ]
+    fallback_text = random.choice(explications)
+
+    if te_val > 35 or rav_val < 800:
+        reco_list = [
+            "Augmentez l'apport personnel pour réduire le capital emprunté et rassurer les banques.",
+            "Envisagez d'allonger la durée du crédit pour diminuer la mensualité et le taux d'endettement.",
+            "Réduisez les charges existantes si possible (rachat de crédits, renégociation) avant de reposter.",
+        ]
+    else:
+        reco_list = [
+            "Comparez les offres détaillées auprès de nos partenaires pour affiner votre choix.",
+            "Un courtier ou votre banque pourra valider ces taux et finaliser votre dossier.",
+        ]
+    fallback_reco = random.choice(reco_list)
+
+    fallback_warn = "Ce résultat est indicatif et ne constitue pas une offre contractuelle. Consultez un conseiller pour valider votre situation."
 
     ExplicationIA.objects.update_or_create(
         simulation=sim,

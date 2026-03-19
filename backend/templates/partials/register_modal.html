@@ -1,0 +1,47 @@
+<div id="register-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center p-4 bg-on-surface/20 backdrop-blur-sm">
+  <div class="glass-effect w-full max-w-xl rounded-xl shadow-[0_12px_32px_rgba(0,101,84,0.06)] overflow-hidden relative" style="background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(24px);">
+    <button type="button" id="register-modal-close" class="absolute top-6 right-6 text-on-surface-variant hover:bg-surface-container-low p-2 rounded-full transition-colors">
+      <span class="material-symbols-outlined">close</span>
+    </button>
+    <div class="p-8 md:p-12">
+      <div class="mb-10">
+        <div class="inline-flex items-center justify-center p-3 bg-primary-container/10 rounded-xl mb-6">
+          <span class="material-symbols-outlined text-primary text-3xl">person_add</span>
+        </div>
+        <h2 class="text-3xl font-headline font-bold text-on-surface tracking-tight leading-tight">
+          Créez un compte pour sauvegarder cette simulation
+        </h2>
+        <p class="mt-4 text-on-surface-variant text-lg">
+          Accédez à votre historique de simulations et retrouvez vos résultats à tout moment.
+        </p>
+      </div>
+      <form id="form-register" class="space-y-6">{% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="reg-prenom">Prénom</label>
+            <input class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="reg-prenom" name="prenom" placeholder="Léa" type="text" required/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="reg-nom">Nom</label>
+            <input class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="reg-nom" name="nom" placeholder="Dupont" type="text" required/>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="reg-email">Email</label>
+          <input class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="reg-email" name="email" placeholder="lea@exemple.fr" type="email" required/>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="reg-password">Mot de passe (min. 8 caractères)</label>
+          <input class="w-full h-12 px-4 bg-surface-container-lowest border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="reg-password" name="password" type="password" minlength="8" required/>
+        </div>
+        <div id="register-error" class="hidden text-error text-sm"></div>
+        <div id="register-success" class="hidden text-primary font-medium">Compte créé ! Votre simulation a été sauvegardée dans votre historique.</div>
+        <button type="submit" id="btn-submit-register" class="w-full h-14 bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg font-label font-bold uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-3">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
+          Créer mon compte
+        </button>
+      </form>
+    </div>
+    <div class="h-1.5 w-full bg-gradient-to-r from-primary via-primary-container to-primary-fixed-dim"></div>
+  </div>
+</div>

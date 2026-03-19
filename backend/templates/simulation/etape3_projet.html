@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Smart Crédit - Votre projet{% endblock %}
+{% block extra_css %}
+<style>
+  input[type='range'] { -webkit-appearance: none; appearance: none; background: transparent; cursor: pointer; }
+  input[type='range']::-webkit-slider-runnable-track { background: #bdc9c433; height: 8px; border-radius: 4px; }
+  input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; margin-top: -12px; background-color: #006554; height: 32px; width: 32px; border-radius: 50%; border: 4px solid #ffffff; box-shadow: 0 4px 12px rgba(0, 101, 84, 0.15); }
+</style>
+{% endblock %}
+{% block content %}
+<main class="flex-grow flex flex-col items-center justify-center px-6 py-12 max-w-4xl mx-auto w-full">
+  <div class="w-full flex justify-between items-end mb-12">
+    <div class="space-y-1">
+      <p class="text-sm font-medium text-primary uppercase tracking-widest">Étape 3 sur 3</p>
+      <h2 class="text-4xl font-extrabold tracking-tight text-on-surface">Votre projet</h2>
+    </div>
+    <div class="flex gap-1.5 pb-2">
+      <div class="h-1.5 w-8 rounded-full bg-primary-container opacity-20"></div>
+      <div class="h-1.5 w-8 rounded-full bg-primary-container opacity-20"></div>
+      <div class="h-1.5 w-16 rounded-full bg-primary"></div>
+    </div>
+  </div>
+  <form id="form-etape3" class="w-full space-y-16">
+    <input type="hidden" id="type_credit" name="type_credit" value="IMMOBILIER"/>
+    <div class="w-full bg-surface-container-low p-2 rounded-xl flex mb-12">
+      <button type="button" class="btn-type-credit flex-1 py-4 text-center rounded-lg font-bold shadow-sm transition-all" data-value="IMMOBILIER">Prêt Immobilier</button>
+      <button type="button" class="btn-type-credit flex-1 py-4 text-center rounded-lg font-medium transition-colors" data-value="ETUDIANT">Prêt Étudiant</button>
+    </div>
+    <section class="space-y-8">
+      <div class="flex justify-between items-end">
+        <label class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Montant du prêt</label>
+        <div class="text-right">
+          <span id="montant-display" class="text-5xl font-extrabold tracking-tighter text-primary">245 000</span>
+          <span class="text-2xl font-bold text-primary ml-1">€</span>
+        </div>
+      </div>
+      <div class="relative py-4">
+        <input class="w-full h-2 rounded-full" id="montant" name="montant" max="1000000" min="50000" step="5000" type="range" value="245000"/>
+        <input type="hidden" id="montant_raw" value="245000"/>
+        <div class="flex justify-between mt-4 text-xs font-medium text-outline">
+          <span>50 000 €</span>
+          <span>1 000 000 €</span>
+        </div>
+      </div>
+    </section>
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12">
+      <div class="md:col-span-7 space-y-6">
+        <label class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Durée du crédit</label>
+        <div class="flex gap-4">
+          <button type="button" class="btn-duree flex-1 py-6 px-4 rounded-xl border-2 border-transparent bg-surface-container-low flex flex-col items-center gap-2 hover:bg-surface-container-high transition-all" data-mois="180">
+            <span class="text-2xl font-extrabold text-on-surface">15</span>
+            <span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Ans</span>
+          </button>
+          <button type="button" class="btn-duree flex-1 py-6 px-4 rounded-xl border-2 border-primary bg-surface-container-lowest flex flex-col items-center gap-2 transition-all" data-mois="240">
+            <span class="text-2xl font-extrabold text-primary">20</span>
+            <span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Ans</span>
+          </button>
+          <button type="button" class="btn-duree flex-1 py-6 px-4 rounded-xl border-2 border-transparent bg-surface-container-low flex flex-col items-center gap-2 hover:bg-surface-container-high transition-all" data-mois="300">
+            <span class="text-2xl font-extrabold text-on-surface">25</span>
+            <span class="text-xs font-bold text-on-surface-variant uppercase tracking-tighter">Ans</span>
+          </button>
+        </div>
+        <input type="hidden" id="duree_mois" name="duree_mois" value="240"/>
+      </div>
+      <div class="md:col-span-5 space-y-6">
+        <label class="text-sm font-bold uppercase tracking-widest text-on-surface-variant">Votre apport personnel</label>
+        <div class="relative group">
+          <div class="absolute inset-y-0 left-6 flex items-center pointer-events-none">
+            <span class="text-primary font-bold text-xl">€</span>
+          </div>
+          <input class="w-full bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary rounded-xl py-8 pl-14 pr-6 text-2xl font-bold text-on-surface transition-all" id="apport" name="apport" type="text" value="35000" placeholder="0"/>
+        </div>
+        <p class="text-xs text-on-surface-variant/70 italic px-2">Recommandé : minimum 10% du montant total</p>
+      </div>
+    </div>
+    <div class="bg-primary/5 p-8 rounded-2xl border border-primary/10 flex items-center gap-6">
+      <div class="w-16 h-16 rounded-full bg-primary flex items-center justify-center shrink-0">
+        <span class="material-symbols-outlined text-white text-3xl" style="font-variation-settings: 'FILL' 1;">insights</span>
+      </div>
+      <div>
+        <h4 class="font-bold text-primary mb-1">Analyse de faisabilité</h4>
+        <p class="text-sm text-on-surface-variant leading-relaxed">Basé sur vos revenus de l'étape précédente, votre dossier sera analysé par notre IA.</p>
+      </div>
+    </div>
+  </form>
+</main>
+<div class="h-32"></div>
+<div id="error-message" class="hidden fixed top-24 left-1/2 -translate-x-1/2 bg-error text-white px-6 py-3 rounded-lg z-50 shadow-lg"></div>
+{% endblock %}
+{% block bottom_nav %}
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pb-safe bg-white/80 dark:bg-[#1c1b1b]/80 backdrop-blur-xl shadow-[0_-12px_32px_rgba(0,101,84,0.06)] rounded-t-2xl border-t border-[#bdc9c4]/20">
+  <a href="/simulation/etape-2/" class="flex items-center justify-center text-[#3e4945] dark:text-[#bdc9c4] px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] duration-200">
+    <span class="material-symbols-outlined mr-2">arrow_back</span>
+    <span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Précédent</span>
+  </a>
+  <button type="button" id="btn-etape3-submit" class="flex items-center justify-center bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg px-8 py-3 hover:opacity-90 transition-opacity active:scale-[0.98] duration-200">
+    <span class="font-['Inter'] text-sm font-medium uppercase tracking-wider">Lancer l'analyse</span>
+    <span class="material-symbols-outlined ml-2">arrow_forward</span>
+  </button>
+</nav>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/simulation.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    SmartCreditSimulation.initEtape3();
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,124 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Smart Crédit - Revenus & Charges{% endblock %}
+{% block extra_css %}
+<style>.glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }</style>
+{% endblock %}
+{% block content %}
+<main class="flex-grow w-full max-w-5xl mx-auto px-6 pt-8 pb-32">
+  <div class="mb-12">
+    <div class="flex justify-between items-end mb-4">
+      <div>
+        <span class="text-label-sm text-on-surface-variant font-medium tracking-wider uppercase">Étape 2 sur 3</span>
+        <h2 class="text-3xl font-headline font-extrabold tracking-tight mt-1">Vos revenus et charges</h2>
+      </div>
+    </div>
+    <div class="h-1.5 w-full bg-surface-container-highest rounded-full overflow-hidden">
+      <div class="h-full bg-primary w-2/3 rounded-full transition-all duration-500"></div>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+    <div class="lg:col-span-7 space-y-10">
+      <form id="form-etape2">
+        <section>
+          <label class="block text-sm font-semibold text-on-surface-variant mb-4 uppercase tracking-widest">Type de contrat</label>
+          <div class="flex flex-wrap gap-3">
+            <button type="button" class="btn-contrat px-6 py-2.5 rounded-full border border-primary text-primary font-medium text-sm hover:bg-primary/5 transition-colors" data-value="CDI">CDI</button>
+            <button type="button" class="btn-contrat px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-medium text-sm hover:bg-surface-container-low transition-colors" data-value="CDD">CDD</button>
+            <button type="button" class="btn-contrat px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-medium text-sm hover:bg-surface-container-low transition-colors" data-value="INDEPENDANT">Indépendant</button>
+            <button type="button" class="btn-contrat px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-medium text-sm hover:bg-surface-container-low transition-colors" data-value="ETUDIANT">Étudiant</button>
+          </div>
+          <input type="hidden" id="type_contrat" name="type_contrat" value="CDI"/>
+        </section>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 mt-8">
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-on-surface-variant ml-1" for="salaire">Salaire net mensuel</label>
+            <div class="relative group">
+              <input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 focus:border-primary focus:ring-0 transition-all text-lg font-medium" id="salaire" name="salaire" placeholder="3 200" type="number" min="0" step="0.01"/>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">€</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-on-surface-variant ml-1" for="autres">Autres revenus</label>
+            <div class="relative group">
+              <input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 focus:border-primary focus:ring-0 transition-all text-lg font-medium" id="autres" name="autres" placeholder="0" type="number" min="0" step="0.01"/>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">€</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-on-surface-variant ml-1" for="loyer">Loyer actuel</label>
+            <div class="relative group">
+              <input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 focus:border-primary focus:ring-0 transition-all text-lg font-medium" id="loyer" name="loyer" placeholder="850" type="number" min="0" step="0.01"/>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">€</span>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="block text-sm font-semibold text-on-surface-variant ml-1" for="credits">Crédits en cours</label>
+            <div class="relative group">
+              <input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 focus:border-primary focus:ring-0 transition-all text-lg font-medium" id="credits" name="credits" placeholder="0" type="number" min="0" step="0.01"/>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">€</span>
+            </div>
+          </div>
+          <div class="space-y-2 md:col-span-2">
+            <label class="block text-sm font-semibold text-on-surface-variant ml-1" for="autres_charges">Autres charges mensuelles</label>
+            <div class="relative group">
+              <input class="w-full h-12 px-4 rounded-xl bg-surface-container-lowest border border-outline-variant/20 focus:border-primary focus:ring-0 transition-all text-lg font-medium" id="autres_charges" name="autres_charges" placeholder="0" type="number" min="0" step="0.01"/>
+              <span class="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant font-medium">€</span>
+            </div>
+          </div>
+        </div>
+      </form>
+      <div class="p-6 rounded-2xl bg-surface-container-low border-l-4 border-primary/40 flex gap-4">
+        <span class="material-symbols-outlined text-primary">info</span>
+        <p class="text-sm text-on-surface-variant leading-relaxed">
+          Ces informations nous permettent de calculer votre capacité d'emprunt maximale tout en garantissant votre confort financier.
+        </p>
+      </div>
+    </div>
+    <div class="lg:col-span-5">
+      <div class="sticky top-24 space-y-6">
+        <div class="glass-card p-8 rounded-[2rem] border border-white/40 shadow-[0_12px_32px_rgba(0,101,84,0.06)]">
+          <h3 class="text-sm font-bold text-primary uppercase tracking-widest mb-6">Estimation Directe</h3>
+          <div class="space-y-1">
+            <p class="text-on-surface-variant text-sm font-medium">Reste à vivre estimé</p>
+            <div class="flex items-baseline gap-2">
+              <span id="reste-vivre-estime" class="text-5xl font-extrabold tracking-tighter text-on-surface">—</span>
+              <span class="text-2xl font-bold text-on-surface-variant">€</span>
+            </div>
+          </div>
+        </div>
+        <div class="bg-surface-container-lowest p-6 rounded-2xl flex items-start gap-4">
+          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span class="material-symbols-outlined text-primary text-xl" style="font-variation-settings: 'FILL' 1;">security</span>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-on-surface">Données Sécurisées</h4>
+            <p class="text-xs text-on-surface-variant mt-1">Vos informations sont chiffrées et ne sont jamais partagées sans votre accord.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<div id="error-message" class="hidden fixed top-24 left-1/2 -translate-x-1/2 bg-error text-white px-6 py-3 rounded-lg z-50 shadow-lg"></div>
+{% endblock %}
+{% block bottom_nav %}
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-between items-center px-6 py-4 pb-safe bg-white/80 dark:bg-[#1c1b1b]/80 backdrop-blur-xl shadow-[0_-12px_32px_rgba(0,101,84,0.06)] rounded-t-2xl border-t border-[#bdc9c4]/20">
+  <a href="/simulation/etape-1/" class="flex items-center justify-center text-[#3e4945] dark:text-[#bdc9c4] px-8 py-3 font-['Inter'] text-sm font-medium uppercase tracking-wider hover:opacity-90 transition-opacity active:scale-[0.98]">
+    <span class="material-symbols-outlined mr-2">arrow_back</span>
+    Précédent
+  </a>
+  <button type="button" id="btn-etape2-next" class="flex items-center justify-center bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg px-8 py-3 font-['Inter'] text-sm font-medium uppercase tracking-wider hover:opacity-90 transition-opacity active:scale-[0.98]">
+    Suivant
+    <span class="material-symbols-outlined ml-2">arrow_forward</span>
+  </button>
+</nav>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/simulation.js' %}"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    SmartCreditSimulation.initEtape2();
+  });
+</script>
+{% endblock %}

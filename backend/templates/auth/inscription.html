@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Smart Crédit - Création de compte{% endblock %}
+{% block content %}
+<main class="flex-grow flex flex-col items-center justify-center px-6 py-16">
+  <div class="w-full max-w-md">
+    <div class="text-center mb-10">
+      <div class="inline-flex items-center justify-center p-3 bg-primary-container/10 rounded-xl mb-6">
+        <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">person_add</span>
+      </div>
+      <h1 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Créer un compte</h1>
+      <p class="mt-2 text-on-surface-variant">Inscrivez-vous pour sauvegarder vos simulations et accéder à votre historique.</p>
+    </div>
+    <div class="bg-surface-container-lowest rounded-2xl shadow-[0_12px_32px_rgba(0,101,84,0.06)] border border-outline-variant/20 p-8">
+      <form id="form-inscription" class="space-y-6">{% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="space-y-2">
+            <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="insc-prenom">Prénom</label>
+            <input class="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="insc-prenom" name="prenom" placeholder="Léa" type="text" required/>
+          </div>
+          <div class="space-y-2">
+            <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="insc-nom">Nom</label>
+            <input class="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="insc-nom" name="nom" placeholder="Dupont" type="text" required/>
+          </div>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="insc-email">Email</label>
+          <input class="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="insc-email" name="email" placeholder="lea@exemple.fr" type="email" required/>
+        </div>
+        <div class="space-y-2">
+          <label class="text-sm font-label font-semibold text-on-surface-variant uppercase tracking-wider" for="insc-password">Mot de passe (min. 8 caractères)</label>
+          <input class="w-full h-12 px-4 bg-surface-container-low border border-outline-variant/20 rounded-lg focus:outline-none focus:border-primary transition-all" id="insc-password" name="password" type="password" minlength="8" required/>
+        </div>
+        <div id="inscription-error" class="hidden text-error text-sm"></div>
+        <button type="submit" id="btn-inscription" class="w-full h-14 bg-gradient-to-br from-[#006554] to-[#0c806b] text-white rounded-lg font-label font-bold uppercase tracking-widest shadow-lg shadow-primary/20 active:scale-[0.98] transition-all hover:opacity-90 flex items-center justify-center gap-3">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">person_add</span>
+          Créer mon compte
+        </button>
+      </form>
+    </div>
+    <p class="mt-8 text-center text-on-surface-variant">
+      Vous avez déjà un compte ?
+      <a href="/connexion/" class="text-primary font-bold hover:underline">Se connecter</a>
+    </p>
+  </div>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/auth.js' %}"></script>
+{% endblock %}

@@ -6,12 +6,14 @@ from .models import User
 
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True, min_length=8)
+    simulation_id = serializers.IntegerField(required=False, allow_null=True, write_only=True)
 
     class Meta:
         model = User
-        fields = ["id", "email", "nom", "prenom", "password"]
+        fields = ["id", "email", "nom", "prenom", "password", "simulation_id"]
 
     def create(self, validated_data):
+        validated_data.pop("simulation_id", None)
         password = validated_data.pop("password")
         return User.objects.create_user(password=password, **validated_data)
 
