@@ -13,4 +13,5 @@ urlpatterns = [
     path("simulation/etape-3/", views.SimulationEtape3View.as_view(), name="etape3"),
     path("simulation/analyse/<int:simulation_id>/", views.AnalyseView.as_view(), name="analyse"),
     path("simulation/resultats/<int:simulation_id>/", views.TableauBordView.as_view(), name="resultats"),
+    path("simulation/historique/", views.HistoriqueView.as_view(), name="historique"),
 ]

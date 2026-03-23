@@ -27,12 +27,15 @@
   }
 
   function saveToken(data) {
-    if (data.access) {
-      try {
-        localStorage.setItem('smartcredit_access', data.access);
-        if (data.refresh) localStorage.setItem('smartcredit_refresh', data.refresh);
-      } catch (e) {}
+    if (!data || !data.access) return;
+    if (window.SmartCreditApi && window.SmartCreditApi.setTokens) {
+      window.SmartCreditApi.setTokens(data);
+      return;
     }
+    try {
+      localStorage.setItem('smartcredit_access', data.access);
+      if (data.refresh) localStorage.setItem('smartcredit_refresh', data.refresh);
+    } catch (e) {}
   }
 
   function redirectAfterAuth() {
@@ -53,7 +56,7 @@
           method: 'POST',
           headers: getCsrfHeaders(),
           body: JSON.stringify({
-            username: document.getElementById('login-email').value.trim(),
+            email: document.getElementById('login-email').value.trim().toLowerCase(),
             password: document.getElementById('login-password').value
           }),
           credentials: 'same-origin'
@@ -98,7 +101,7 @@
             return fetch(API_BASE + '/auth/token/', {
               method: 'POST',
               headers: getCsrfHeaders(),
-              body: JSON.stringify({ username: payload.email, password: payload.password }),
+              body: JSON.stringify({ email: payload.email.toLowerCase(), password: payload.password }),
               credentials: 'same-origin'
             });
           })

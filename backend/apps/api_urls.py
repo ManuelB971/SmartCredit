@@ -13,6 +13,7 @@ urlpatterns = [
     path("simulations/", credit_api.create_simulation, name="create_simulation"),
     path("simulations/<int:simulation_id>/", credit_api.get_simulation, name="get_simulation"),
     path("simulations/<int:simulation_id>/calcul/", credit_api.calculate_simulation, name="calculate_simulation"),
+    path("simulations/<int:simulation_id>/save/", credit_api.save_simulation, name="save_simulation"),
     path("users/me/simulations/", credit_api.my_simulations, name="my_simulations"),
     path("simulations/<int:simulation_id>/export-email/", export_api.export_email, name="export_email"),
     path("offres/", credit_api.list_offres, name="list_offres"),

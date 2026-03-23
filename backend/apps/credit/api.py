@@ -314,6 +314,34 @@ def calculate_simulation(request, simulation_id: int):
 
 @extend_schema(
     tags=["Simulations"],
+    summary="Sauvegarder une simulation dans le compte connecté",
+    description="Associe une simulation existante au compte connecté si elle n'est pas encore liée.",
+    responses={
+        200: OpenApiResponse(description="Simulation sauvegardée"),
+        403: OpenApiResponse(description="Simulation déjà liée à un autre utilisateur"),
+        404: OpenApiResponse(description="Simulation introuvable"),
+    },
+)
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def save_simulation(request, simulation_id: int):
+    try:
+        sim = Simulation.objects.get(id=simulation_id)
+    except Simulation.DoesNotExist:
+        return Response({"error": "Simulation introuvable"}, status=404)
+
+    if sim.utilisateur_id and sim.utilisateur_id != request.user.id:
+        return Response({"error": "Simulation indisponible"}, status=403)
+
+    if sim.utilisateur_id != request.user.id:
+        sim.utilisateur = request.user
+        sim.save(update_fields=["utilisateur"])
+
+    return Response({"ok": True, "simulation_id": sim.id}, status=status.HTTP_200_OK)
+
+
+@extend_schema(
+    tags=["Simulations"],
     summary="Historique des simulations (utilisateur connecté)",
     responses={200: OpenApiResponse(description="Liste des simulations"), 401: OpenApiResponse(description="Non authentifié")},
 )

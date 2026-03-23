@@ -41,3 +41,7 @@ class TableauBordView(TemplateView):
         context = super().get_context_data(**kwargs)
         context["simulation_id"] = self.kwargs.get("simulation_id")
         return context
+
+
+class HistoriqueView(TemplateView):
+    template_name = "simulation/historique.html"

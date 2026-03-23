@@ -7,6 +7,7 @@ from rest_framework.response import Response
 from apps.credit.models import Simulation
 from .models import ExportPdfEmail
 from .serializers import ExportEmailRequestSerializer, ExportPdfEmailSerializer
+from .tasks import send_export_pdf_email
 
 
 @extend_schema(
@@ -37,5 +38,6 @@ def export_email(request, simulation_id: int):
         return Response({"error": "Simulation introuvable"}, status=404)
 
     export = ExportPdfEmail.objects.create(simulation=sim, email_destinataire=serializer.validated_data["email"])
+    send_export_pdf_email.delay(export.id)
     return Response(ExportPdfEmailSerializer(export).data, status=status.HTTP_201_CREATED)
 

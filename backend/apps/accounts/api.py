@@ -84,10 +84,14 @@ def logout_view(request):
     tags=["Auth"],
     summary="Profil courant",
     description="Retourne l'utilisateur courant (authentification requise).",
-    responses={200: MeSerializer},
+    responses={200: MeSerializer, 204: OpenApiResponse(description="Compte supprimé")},
 )
-@api_view(["GET"])
+@api_view(["GET", "DELETE"])
 @permission_classes([IsAuthenticated])
 def me(request):
+    if request.method == "DELETE":
+        request.user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     return Response(MeSerializer(request.user).data)
 

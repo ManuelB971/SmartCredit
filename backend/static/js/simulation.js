@@ -32,6 +32,13 @@
     return isNaN(n) ? '0.00' : n.toFixed(2);
   }
 
+  function formatDate(value) {
+    if (!value) return '-';
+    var d = new Date(value);
+    if (isNaN(d.getTime())) return value;
+    return d.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
   var SmartCreditSimulation = {
     initEtape1: function() {
       var simId = parseInt(new URLSearchParams(window.location.search).get('simulation_id'), 10);
@@ -450,7 +457,40 @@
           document.getElementById('email-modal-close').addEventListener('click', function() {
             document.getElementById('email-modal').classList.add('hidden');
           });
+          var registerBtn = document.getElementById('btn-register');
+          var registerIcon = document.getElementById('btn-register-icon');
+          var registerLabel = document.getElementById('btn-register-label');
+          var isLoggedIn = false;
+          if (window.SmartCreditApi && window.SmartCreditApi.getAccessToken) {
+            isLoggedIn = !!window.SmartCreditApi.getAccessToken();
+          }
+
+          if (registerBtn && isLoggedIn) {
+            if (registerIcon) registerIcon.textContent = 'save';
+            if (registerLabel) registerLabel.textContent = 'Sauvegarder';
+          }
+
           document.getElementById('btn-register').addEventListener('click', function() {
+            if (isLoggedIn && window.SmartCreditApi && window.SmartCreditApi.authFetch) {
+              registerBtn.disabled = true;
+              window.SmartCreditApi.authFetch(API_BASE + '/simulations/' + simulationId + '/save/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+              })
+                .then(function(res) {
+                  if (!res.ok) return res.json().then(function(j) { throw new Error(j.error || 'Erreur de sauvegarde'); });
+                  if (registerIcon) registerIcon.textContent = 'check_circle';
+                  if (registerLabel) registerLabel.textContent = 'Simulation sauvegardee';
+                  registerBtn.classList.remove('border-primary', 'text-primary', 'hover:bg-primary/5');
+                  registerBtn.classList.add('bg-primary', 'text-white');
+                })
+                .catch(function(err) {
+                  document.getElementById('error-container').classList.remove('hidden');
+                  document.getElementById('error-container').querySelector('p').textContent = err.message || 'Erreur de sauvegarde.';
+                  registerBtn.disabled = false;
+                });
+              return;
+            }
             document.getElementById('register-modal').classList.remove('hidden');
           });
           document.getElementById('register-modal-close').addEventListener('click', function() {
@@ -538,6 +578,65 @@
         })
         .catch(function() {
           document.getElementById('loading-state').innerHTML = '<p class="text-error">Simulation introuvable.</p><a href="/simulation/etape-1/" class="text-primary underline">Recommencer</a>';
+        });
+    },
+
+    initHistorique: function() {
+      var loadingEl = document.getElementById('history-loading');
+      var emptyEl = document.getElementById('history-empty');
+      var errorEl = document.getElementById('history-error');
+      var listEl = document.getElementById('history-list');
+
+      if (!window.SmartCreditApi || !window.SmartCreditApi.authFetch) {
+        loadingEl.classList.add('hidden');
+        errorEl.classList.remove('hidden');
+        errorEl.textContent = 'Session indisponible. Reconnectez-vous.';
+        return;
+      }
+
+      window.SmartCreditApi.authFetch(API_BASE + '/users/me/simulations/', { method: 'GET' })
+        .then(function(res) {
+          if (res.status === 401) {
+            window.location.href = '/connexion/?next=/simulation/historique/';
+            return null;
+          }
+          if (!res.ok) {
+            return res.json().then(function(j) { throw new Error(j.error || 'Impossible de charger votre historique.'); });
+          }
+          return res.json();
+        })
+        .then(function(payload) {
+          if (!payload) return;
+          var sims = payload.simulations || [];
+          loadingEl.classList.add('hidden');
+          if (!sims.length) {
+            emptyEl.classList.remove('hidden');
+            return;
+          }
+
+          listEl.classList.remove('hidden');
+          listEl.innerHTML = sims.map(function(sim) {
+            var typeLabel = sim.type_credit === 'IMMOBILIER' ? 'Immobilier' : 'Etudiant';
+            return (
+              '<a href="/simulation/resultats/' + sim.id + '/" class="block bg-surface-container-low rounded-xl p-5 border border-outline-variant/20 hover:bg-surface-container-lowest transition-colors">' +
+                '<div class="flex items-center justify-between gap-4">' +
+                  '<div>' +
+                    '<p class="text-xs uppercase tracking-widest text-on-surface-variant">Simulation #' + sim.id + '</p>' +
+                    '<p class="text-lg font-semibold text-on-surface mt-1">' + typeLabel + '</p>' +
+                  '</div>' +
+                  '<div class="text-right">' +
+                    '<p class="text-sm text-on-surface-variant">' + formatDate(sim.date_simulation) + '</p>' +
+                    '<p class="text-xs text-on-surface-variant mt-1">' + (sim.statut || '-') + '</p>' +
+                  '</div>' +
+                '</div>' +
+              '</a>'
+            );
+          }).join('');
+        })
+        .catch(function(err) {
+          loadingEl.classList.add('hidden');
+          errorEl.classList.remove('hidden');
+          errorEl.textContent = err.message || 'Impossible de charger votre historique.';
         });
     }
   };
