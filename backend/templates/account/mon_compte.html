@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Smart Crédit - Mon compte{% endblock %}
+{% block content %}
+<main class="max-w-4xl mx-auto px-6 py-12">
+  <div class="mb-10">
+    <h1 class="text-3xl font-headline font-bold text-on-surface tracking-tight">Mon compte</h1>
+    <p class="mt-2 text-on-surface-variant">Retrouvez l'historique de vos simulations.</p>
+  </div>
+
+  <div id="loading-state" class="animate-pulse space-y-4">
+    <div class="h-24 bg-surface-container-low rounded-xl"></div>
+    <div class="h-24 bg-surface-container-low rounded-xl"></div>
+    <div class="h-24 bg-surface-container-low rounded-xl"></div>
+  </div>
+
+  <div id="content-state" class="hidden">
+    <div id="auth-required" class="hidden bg-amber-50 border border-amber-200 rounded-2xl p-8 text-center">
+      <span class="material-symbols-outlined text-4xl text-amber-600 mb-4" style="font-variation-settings: 'FILL' 1;">info</span>
+      <p class="text-on-surface-variant font-medium">Connectez-vous pour accéder à votre historique de simulations.</p>
+      <a href="/connexion/?next=/mon-compte/" class="inline-block mt-4 bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">Se connecter</a>
+    </div>
+
+    <div id="simulations-list" class="hidden space-y-4"></div>
+    <div id="empty-state" class="hidden bg-surface-container-low rounded-2xl p-12 text-center">
+      <span class="material-symbols-outlined text-5xl text-on-surface-variant/50 mb-4">folder_open</span>
+      <p class="text-on-surface-variant font-medium">Aucune simulation enregistrée.</p>
+      <p class="text-sm text-on-surface-variant/70 mt-1">Lancez une simulation pour la retrouver ici.</p>
+      <a href="/simulation/etape-1/" class="inline-block mt-6 bg-primary text-white px-6 py-3 rounded-xl font-bold hover:opacity-90 transition-opacity">Nouvelle simulation</a>
+    </div>
+  </div>
+</main>
+{% endblock %}
+{% block extra_js %}
+<script src="{% static 'js/simulation.js' %}"></script>
+<script>
+(function() {
+  var API_BASE = '/api';
+  function getAuthHeaders() {
+    var headers = { 'Content-Type': 'application/json' };
+    try {
+      var token = localStorage.getItem('smartcredit_access');
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+    } catch (e) {}
+    var csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrf && csrf.value) headers['X-CSRFToken'] = csrf.value;
+    return headers;
+  }
+  function formatDate(s) {
+    if (!s) return '—';
+    var d = new Date(s);
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+  }
+  function formatNumber(n) {
+    return String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch(API_BASE + '/users/me/simulations/', {
+      headers: getAuthHeaders(),
+      credentials: 'same-origin'
+    })
+      .then(function(res) {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('content-state').classList.remove('hidden');
+        if (res.status === 401) {
+          document.getElementById('auth-required').classList.remove('hidden');
+          return null;
+        }
+        if (!res.ok) throw new Error('Erreur lors du chargement');
+        return res.json();
+      })
+      .then(function(data) {
+        if (!data) return;
+        var sims = data.simulations || [];
+        var container = document.getElementById('simulations-list');
+        var emptyEl = document.getElementById('empty-state');
+        if (sims.length === 0) {
+          emptyEl.classList.remove('hidden');
+          return;
+        }
+        var typeLabels = { IMMOBILIER: 'Crédit immobilier', ETUDIANT: 'Crédit étudiant' };
+        var statutLabels = { TERMINEE: 'Terminée', EN_COURS: 'En cours' };
+        sims.forEach(function(s) {
+          var card = document.createElement('a');
+          card.href = '/simulation/resultats/' + s.id + '/';
+          card.className = 'block bg-surface-container-low hover:bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/10 hover:border-primary/20 transition-all group';
+          card.innerHTML = '<div class="flex items-center justify-between">' +
+            '<div class="flex items-center gap-4">' +
+            '<div class="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center group-hover:bg-primary/15 transition-colors">' +
+            '<span class="material-symbols-outlined text-primary" style="font-variation-settings: \'FILL\' 1;">account_balance</span></div>' +
+            '<div><h3 class="font-bold text-on-surface">' + (typeLabels[s.type_credit] || s.type_credit) + '</h3>' +
+            '<p class="text-sm text-on-surface-variant">' + formatDate(s.date_simulation) + '</p></div></div>' +
+            '<div class="flex items-center gap-2">' +
+            '<span class="px-3 py-1 rounded-full text-xs font-bold ' + (s.statut === 'TERMINEE' ? 'bg-green-50 text-green-700' : 'bg-amber-50 text-amber-700') + '">' + (statutLabels[s.statut] || s.statut) + '</span>' +
+            '<span class="material-symbols-outlined text-on-surface-variant group-hover:text-primary transition-colors">arrow_forward</span></div></div>';
+          container.appendChild(card);
+        });
+        container.classList.remove('hidden');
+      })
+      .catch(function(err) {
+        document.getElementById('loading-state').classList.add('hidden');
+        document.getElementById('content-state').classList.remove('hidden');
+        document.getElementById('auth-required').classList.remove('hidden');
+        document.getElementById('auth-required').querySelector('p').textContent = err.message || 'Une erreur est survenue.';
+      });
+  });
+})();
+</script>
+{% endblock %}

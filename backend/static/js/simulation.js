@@ -7,6 +7,17 @@
   var STORAGE_KEY = 'smartcredit_wizard';
   var API_BASE = '/api';
 
+  function getAuthHeaders() {
+    var headers = { 'Content-Type': 'application/json' };
+    try {
+      var token = localStorage.getItem('smartcredit_access');
+      if (token) headers['Authorization'] = 'Bearer ' + token;
+    } catch (e) {}
+    var csrf = document.querySelector('[name=csrfmiddlewaretoken]');
+    if (csrf && csrf.value) headers['X-CSRFToken'] = csrf.value;
+    return headers;
+  }
+
   function getWizardData() {
     try {
       var raw = sessionStorage.getItem(STORAGE_KEY);
@@ -84,11 +95,15 @@
       };
 
       if (simId && !isNaN(simId)) {
-        fetch(API_BASE + '/simulations/' + simId + '/')
+        fetch(API_BASE + '/simulations/' + simId + '/', {
+          headers: getAuthHeaders(),
+          credentials: 'same-origin'
+        })
           .then(function(res) { return res.ok ? res.json() : Promise.reject(); })
           .then(function(sim) {
             var pf = sim.profil_financier || {};
             var pc = sim.projet_credit || {};
+
             var sitFam = pf.situation_familiale;
             if (!sitFam || !['CELIBATAIRE','MARIE','PACS'].includes(sitFam)) sitFam = 'CELIBATAIRE';
             setWizardData({
@@ -140,6 +155,27 @@
       if (data.charges_logement !== undefined) document.getElementById('loyer').value = data.charges_logement;
       if (data.charges_credits !== undefined) document.getElementById('credits').value = data.charges_credits;
       if (data.autres_charges !== undefined) document.getElementById('autres_charges').value = data.autres_charges;
+      var anciennete = data.anciennete_emploi_mois || 3;
+      document.getElementById('anciennete_emploi_mois').value = anciennete;
+      document.querySelectorAll('.btn-anciennete').forEach(function(btn) {
+        var active = parseInt(btn.dataset.mois, 10) === anciennete;
+        btn.classList.toggle('border-primary', active);
+        btn.classList.toggle('text-primary', active);
+        btn.classList.toggle('border-outline-variant/30', !active);
+        btn.classList.toggle('text-on-surface-variant', !active);
+      });
+
+      document.querySelectorAll('.btn-anciennete').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.btn-anciennete').forEach(function(b) {
+            b.classList.remove('border-primary', 'text-primary');
+            b.classList.add('border-outline-variant/30', 'text-on-surface-variant');
+          });
+          btn.classList.add('border-primary', 'text-primary');
+          btn.classList.remove('border-outline-variant/30', 'text-on-surface-variant');
+          document.getElementById('anciennete_emploi_mois').value = btn.dataset.mois;
+        });
+      });
 
       document.querySelectorAll('.btn-contrat').forEach(function(btn) {
         btn.addEventListener('click', function() {
@@ -173,6 +209,7 @@
         }
         setWizardData({
           type_contrat: document.getElementById('type_contrat').value,
+          anciennete_emploi_mois: parseInt(document.getElementById('anciennete_emploi_mois').value, 10) || 3,
           revenus_mensuels: parseDecimal(document.getElementById('salaire').value),
           autres_revenus: parseDecimal(document.getElementById('autres').value),
           charges_logement: parseDecimal(document.getElementById('loyer').value),
@@ -277,7 +314,7 @@
       });
 
       var apportInput = document.getElementById('apport');
-      if (data.apport_personnel !== undefined) apportInput.value = String(data.apport_personnel).replace('.', '');
+      if (data.apport_personnel !== undefined) apportInput.value = String(Math.round(parseFloat(data.apport_personnel) || 0));
       apportInput.addEventListener('input', function() {
         this.value = this.value.replace(/[^\d]/g, '');
       });
@@ -315,8 +352,9 @@
 
         fetch(API_BASE + '/simulations/', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload)
+          headers: getAuthHeaders(),
+          body: JSON.stringify(payload),
+          credentials: 'same-origin'
         })
           .then(function(res) {
             if (!res.ok) return res.json().then(function(j) { throw new Error(j.detail || j.error || JSON.stringify(j)); });
@@ -356,8 +394,9 @@
 
       fetch(API_BASE + '/simulations/' + simulationId + '/calcul/', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: '{}'
+        headers: getAuthHeaders(),
+        body: '{}',
+        credentials: 'same-origin'
       })
         .then(function(res) {
           clearInterval(iv);
@@ -385,7 +424,10 @@
         return;
       }
 
-      fetch(API_BASE + '/simulations/' + simulationId + '/')
+      fetch(API_BASE + '/simulations/' + simulationId + '/', {
+        headers: getAuthHeaders(),
+        credentials: 'same-origin'
+      })
         .then(function(res) {
           if (!res.ok) throw new Error('Simulation introuvable');
           return res.json();
@@ -417,32 +459,149 @@
             var r = resultats.find(function(x) { return x.scenario === scenarioKey; });
             if (!r) return;
             var isReco = scenarioKey === 'EQUILIBRE';
+            var banqueLabel = (r.offre_bancaire && r.offre_bancaire.banque) ? r.offre_bancaire.banque.nom : '';
+            var tauxLabel = (r.offre_bancaire && r.offre_bancaire.taux_annuel) ? parseFloat(r.offre_bancaire.taux_annuel).toFixed(2).replace('.', ',') + ' %' : '';
+            var sousTitre = banqueLabel ? (banqueLabel + (tauxLabel ? ' · ' + tauxLabel : '')) : scenarioDescs[scenarioKey];
             var html = '<div class="bg-surface-container-low hover:bg-surface-container-lowest transition-colors p-6 rounded-xl border ' + (isReco ? 'border-2 border-primary relative bg-surface-container-lowest shadow-[0_12px_48px_rgba(0,101,84,0.12)]' : 'border-transparent hover:border-outline-variant/20') + ' group">';
             if (isReco) html += '<div class="absolute -top-3 right-6 bg-primary text-white px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg"><span class="material-symbols-outlined text-xs" style="font-variation-settings: \'FILL\' 1;">star</span>RECOMMANDÉ</div>';
-            html += '<div class="flex justify-between items-start mb-6"><div><h4 class="' + (isReco ? 'text-xl font-bold text-primary' : 'text-lg font-bold') + '">Scénario ' + scenarioLabels[scenarioKey] + '</h4><p class="text-sm text-on-surface-variant">' + scenarioDescs[scenarioKey] + '</p></div><span class="material-symbols-outlined ' + (isReco ? 'text-primary text-3xl' : 'text-on-surface-variant group-hover:text-primary transition-colors') + '">' + scenarioIcons[scenarioKey] + '</span></div>';
-            html += '<div class="grid grid-cols-2 gap-8"><div><p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Mensualité</p><p class="' + (isReco ? 'text-3xl' : 'text-2xl') + ' font-headline font-extrabold text-on-surface">' + formatNumber(parseFloat(r.mensualite).toFixed(0)) + ' €</p></div><div><p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Coût Total</p><p class="' + (isReco ? 'text-3xl' : 'text-2xl') + ' font-headline font-extrabold text-on-surface">' + formatNumber(parseFloat(r.cout_total).toFixed(0)) + ' €</p></div></div></div>';
+            html += '<div class="flex justify-between items-start mb-6"><div><h4 class="' + (isReco ? 'text-xl font-bold text-primary' : 'text-lg font-bold') + '">Scénario ' + scenarioLabels[scenarioKey] + '</h4><p class="text-sm text-on-surface-variant">' + sousTitre + '</p></div><span class="material-symbols-outlined ' + (isReco ? 'text-primary text-3xl' : 'text-on-surface-variant group-hover:text-primary transition-colors') + '">' + scenarioIcons[scenarioKey] + '</span></div>';
+            var projet = sim.projet_credit || {};
+            var montantTotal = r.montant_total_rembourse != null ? parseFloat(r.montant_total_rembourse) : (parseFloat(projet.montant_souhaite || 0) - parseFloat(projet.apport_personnel || 0) + parseFloat(r.cout_total));
+            html += '<div class="grid grid-cols-3 gap-6"><div><p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Mensualité</p><p class="' + (isReco ? 'text-2xl' : 'text-xl') + ' font-headline font-extrabold text-on-surface">' + formatNumber(parseFloat(r.mensualite).toFixed(0)) + ' €</p></div><div><p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Coût total</p><p class="' + (isReco ? 'text-2xl' : 'text-xl') + ' font-headline font-extrabold text-on-surface">' + formatNumber(parseFloat(r.cout_total).toFixed(0)) + ' €</p></div><div><p class="text-xs font-bold uppercase text-on-surface-variant tracking-wider mb-1">Total à rembourser</p><p class="' + (isReco ? 'text-2xl' : 'text-xl') + ' font-headline font-extrabold text-on-surface">' + formatNumber(Math.round(montantTotal)) + ' €</p></div></div></div>';
             container.insertAdjacentHTML('beforeend', html);
           });
 
           var score = (best && best.score_faisabilite !== null && best.score_faisabilite !== undefined) ? best.score_faisabilite : 75;
-          document.getElementById('score-value').textContent = score;
+          var scoreColor, labelBg, labelText, labelIcon, labelTier;
+          if (score >= 80) {
+            scoreColor = '#006554'; labelBg = 'bg-green-50'; labelText = 'text-green-700'; labelIcon = 'verified'; labelTier = 'Dossier excellent';
+          } else if (score >= 65) {
+            scoreColor = '#16a34a'; labelBg = 'bg-green-50'; labelText = 'text-green-600'; labelIcon = 'check_circle'; labelTier = 'Dossier solide';
+          } else if (score >= 50) {
+            scoreColor = '#d97706'; labelBg = 'bg-amber-50'; labelText = 'text-amber-700'; labelIcon = 'info'; labelTier = 'Dossier moyen';
+          } else if (score >= 30) {
+            scoreColor = '#ea580c'; labelBg = 'bg-orange-50'; labelText = 'text-orange-600'; labelIcon = 'warning'; labelTier = 'Dossier fragile';
+          } else {
+            scoreColor = '#dc2626'; labelBg = 'bg-red-50'; labelText = 'text-red-600'; labelIcon = 'cancel'; labelTier = 'Dossier difficile';
+          }
+          var scoreCircle = document.getElementById('score-circle');
+          scoreCircle.style.stroke = scoreColor;
+          var scoreValueEl = document.getElementById('score-value');
+          scoreValueEl.style.color = scoreColor;
           var circumference = 264;
-          var offset = circumference - (score / 100) * circumference;
-          document.getElementById('score-circle').style.strokeDashoffset = offset;
-          document.getElementById('score-label').innerHTML = score >= 70 ? '<span class="material-symbols-outlined text-lg" style="font-variation-settings: \'FILL\' 1;">check_circle</span>Dossier solide' : '<span class="material-symbols-outlined text-lg">info</span>Dossier à consolider';
+          var targetOffset = circumference - (score / 100) * circumference;
+          scoreCircle.style.strokeDashoffset = circumference;
+          var counter = 0;
+          var steps = 50;
+          var scoreStep = score / steps;
+          var offsetStep = (circumference - targetOffset) / steps;
+          var currentOffset = circumference;
+          var countIv = setInterval(function() {
+            counter = Math.min(counter + scoreStep, score);
+            currentOffset = Math.max(currentOffset - offsetStep, targetOffset);
+            scoreValueEl.textContent = Math.round(counter);
+            scoreCircle.style.strokeDashoffset = currentOffset;
+            if (counter >= score) {
+              clearInterval(countIv);
+              scoreValueEl.textContent = score;
+              scoreCircle.style.strokeDashoffset = targetOffset;
+            }
+          }, 25);
+          var labelEl = document.getElementById('score-label');
+          labelEl.className = labelBg + ' ' + labelText + ' px-5 py-2.5 rounded-full font-bold flex items-center gap-2 text-sm';
+          labelEl.innerHTML = '<span class="material-symbols-outlined text-lg" style="font-variation-settings: \'FILL\' 1;">' + labelIcon + '</span>' + labelTier;
 
           var ai = sim.explication_ia;
           var explEl = document.getElementById('ai-explanation');
-          if (ai && ai.texte_explication) {
-            explEl.innerHTML = '<p>' + ai.texte_explication.replace(/\n/g, '</p><p>') + '</p>';
-            if (ai.recommandations) explEl.innerHTML += '<div class="p-4 bg-surface-container-low rounded-lg border-l-4 border-primary italic text-sm">' + ai.recommandations + '</div>';
+          var resumeEl = document.getElementById('ai-resume-executif');
+          var pointsClesEl = document.getElementById('ai-points-cles');
+          var pointsFortsEl = document.getElementById('ai-points-forts');
+          var risquesEl = document.getElementById('ai-risques');
+          var economieEl = document.getElementById('ai-economie');
+          var economieTextEl = document.getElementById('ai-economie-text');
+          var prochainesEl = document.getElementById('ai-prochaines-etapes');
+          var etapesListEl = document.getElementById('ai-etapes-list');
+
+          if (ai && ai.resume_executif) {
+            resumeEl.textContent = ai.resume_executif;
+            resumeEl.classList.remove('hidden');
           } else {
-            explEl.innerHTML = '<p>Analyse terminée. Consultez les scénarios ci-contre.</p>';
+            resumeEl.classList.add('hidden');
+          }
+
+          var donnees = (ai && ai.donnees_enrichies) ? ai.donnees_enrichies : {};
+          var ptsForts = donnees.points_forts_dossier || [];
+          var risques = donnees.risques_identifies || [];
+          if (ptsForts.length > 0 || risques.length > 0) {
+            pointsClesEl.classList.remove('hidden');
+            pointsFortsEl.innerHTML = ptsForts.map(function(p) { return '<li class="flex items-center gap-2"><span class="text-green-600">•</span>' + p + '</li>'; }).join('');
+            risquesEl.innerHTML = risques.length > 0 ? risques.map(function(r) { return '<li class="flex items-center gap-2"><span class="text-amber-600">•</span>' + r + '</li>'; }).join('') : '<li class="text-on-surface-variant/60 italic">Aucun point d\'attention identifié</li>';
+          } else {
+            pointsClesEl.classList.add('hidden');
+          }
+
+          var prudent = resultats.find(function(x) { return x.scenario === 'PRUDENT'; });
+          var confort = resultats.find(function(x) { return x.scenario === 'CONFORT'; });
+          if (prudent && confort) {
+            var coutPrudent = parseFloat(prudent.cout_total) || 0;
+            var coutConfort = parseFloat(confort.cout_total) || 0;
+            var economie = Math.round(coutConfort - coutPrudent);
+            if (economie > 0) {
+              economieTextEl.textContent = 'En choisissant le scénario Prudent plutôt que Confort, vous économisez environ ' + formatNumber(economie) + ' € d\'intérêts sur la durée du crédit.';
+              economieEl.classList.remove('hidden');
+            } else {
+              economieEl.classList.add('hidden');
+            }
+          } else {
+            economieEl.classList.add('hidden');
+          }
+
+          var prochaines = donnees.prochaines_etapes || [];
+          if (prochaines.length > 0) {
+            prochainesEl.classList.remove('hidden');
+            etapesListEl.innerHTML = prochaines.map(function(e) { return '<li class="flex items-start gap-2"><span class="material-symbols-outlined text-primary text-base mt-0.5 shrink-0" style="font-variation-settings: \'FILL\' 1;">arrow_forward</span>' + e + '</li>'; }).join('');
+          } else {
+            prochainesEl.classList.add('hidden');
+          }
+
+          if (ai && ai.texte_explication) {
+            var aiHtml = '<p class="text-on-surface-variant leading-relaxed">' + ai.texte_explication.replace(/\n+/g, '</p><p class="mt-2 text-on-surface-variant leading-relaxed">') + '</p>';
+            if (ai.recommandations) {
+              var recos = ai.recommandations.split(/\n/).map(function(s) { return s.replace(/^[-•]\s*/, '').trim(); }).filter(Boolean);
+              aiHtml += '<div class="mt-4 p-4 bg-primary/5 rounded-xl border border-primary/15">';
+              aiHtml += '<p class="text-xs font-bold uppercase tracking-widest text-primary mb-2.5">Recommandations</p>';
+              aiHtml += '<ul class="space-y-2">';
+              recos.forEach(function(r) {
+                aiHtml += '<li class="flex items-start gap-2 text-sm text-on-surface-variant"><span class="material-symbols-outlined text-primary text-base mt-0.5 shrink-0" style="font-variation-settings: \'FILL\' 1;">arrow_right</span>' + r + '</li>';
+              });
+              aiHtml += '</ul></div>';
+            }
+            if (ai.avertissements) {
+              aiHtml += '<p class="mt-3 text-xs text-on-surface-variant/60 italic leading-relaxed">' + ai.avertissements + '</p>';
+            }
+            explEl.innerHTML = aiHtml;
+          } else {
+            explEl.innerHTML = '<p class="text-on-surface-variant">Analyse terminée. Consultez les scénarios ci-contre.</p>';
+          }
+
+          var ville = (sim.profil_financier && sim.profil_financier.ville) ? sim.profil_financier.ville.trim() : '';
+          var zonesTendues = ['paris', 'lyon', 'marseille', 'bordeaux', 'toulouse', 'lille', 'nice', 'nantes', 'strasbourg', 'montpellier'];
+          var isZoneTendue = ville && zonesTendues.some(function(z) { return ville.toLowerCase().indexOf(z) >= 0; });
+          var alerteZone = document.getElementById('alerte-zone-tendue');
+          if (alerteZone && isZoneTendue) {
+            document.getElementById('alerte-ville').textContent = ville;
+            alerteZone.classList.remove('hidden');
+          } else if (alerteZone) {
+            alerteZone.classList.add('hidden');
           }
 
           document.body.setAttribute('data-simulation-id', simulationId);
           var btnModif = document.getElementById('btn-modifier-sim');
           if (btnModif) btnModif.setAttribute('href', '/simulation/etape-1/?simulation_id=' + simulationId);
+
+          if (typeof window.renderSmartCreditCharts === 'function') {
+            window.renderSmartCreditCharts(sim);
+          }
 
           document.getElementById('btn-email').addEventListener('click', function() {
             document.getElementById('email-modal').classList.remove('hidden');
@@ -450,9 +609,12 @@
           document.getElementById('email-modal-close').addEventListener('click', function() {
             document.getElementById('email-modal').classList.add('hidden');
           });
-          document.getElementById('btn-register').addEventListener('click', function() {
-            document.getElementById('register-modal').classList.remove('hidden');
-          });
+          var btnRegister = document.getElementById('btn-register');
+          if (btnRegister) {
+            btnRegister.addEventListener('click', function() {
+              document.getElementById('register-modal').classList.remove('hidden');
+            });
+          }
           document.getElementById('register-modal-close').addEventListener('click', function() {
             document.getElementById('register-modal').classList.add('hidden');
           });
@@ -465,17 +627,32 @@
             document.getElementById('email-error').classList.add('hidden');
             fetch(API_BASE + '/simulations/' + simulationId + '/export-email/', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ email: email })
+              headers: getAuthHeaders(),
+              body: JSON.stringify({ email: email }),
+              credentials: 'same-origin'
             })
               .then(function(res) {
-                if (!res.ok) return res.json().then(function(j) { throw new Error(j.email || j.detail || 'Erreur'); });
-                document.getElementById('email-success').classList.remove('hidden');
+                return res.json().then(function(data) {
+                  if (!res.ok) throw new Error(data.error || data.email || data.detail || 'Erreur');
+                  return data;
+                });
+              })
+              .then(function(data) {
+                document.getElementById('email-error').classList.add('hidden');
+                var successEl = document.getElementById('email-success');
+                if (data.etat === 'ENVOYE') {
+                  successEl.textContent = 'PDF envoyé ! Vérifiez votre boîte mail (et les spams).';
+                  successEl.className = 'text-primary font-medium';
+                } else {
+                  successEl.textContent = data.erreur || 'Une erreur est survenue lors de l\'envoi.';
+                  successEl.className = 'text-amber-600 font-medium';
+                }
+                successEl.classList.remove('hidden');
                 setTimeout(function() {
                   document.getElementById('email-modal').classList.add('hidden');
-                  document.getElementById('email-success').classList.add('hidden');
+                  successEl.classList.add('hidden');
                   submitBtn.disabled = false;
-                }, 2000);
+                }, 3000);
               })
               .catch(function(err) {
                 document.getElementById('email-error').textContent = err.message;
@@ -495,12 +672,9 @@
             var submitBtn = document.getElementById('btn-submit-register');
             submitBtn.disabled = true;
             document.getElementById('register-error').classList.add('hidden');
-            var csrfToken = document.querySelector('[name=csrfmiddlewaretoken]') && document.querySelector('[name=csrfmiddlewaretoken]').value;
-            var headers = { 'Content-Type': 'application/json' };
-            if (csrfToken) headers['X-CSRFToken'] = csrfToken;
             fetch(API_BASE + '/auth/register/', {
               method: 'POST',
-              headers: headers,
+              headers: getAuthHeaders(),
               body: JSON.stringify(payload),
               credentials: 'same-origin'
             })
@@ -521,12 +695,19 @@
                   return data;
                 });
               })
-              .then(function() {
+              .then(function(data) {
+                if (data && data.access) {
+                  try {
+                    localStorage.setItem('smartcredit_access', data.access);
+                    if (data.refresh) localStorage.setItem('smartcredit_refresh', data.refresh);
+                  } catch (e) {}
+                }
                 document.getElementById('register-success').classList.remove('hidden');
                 setTimeout(function() {
                   document.getElementById('register-modal').classList.add('hidden');
                   document.getElementById('register-success').classList.add('hidden');
                   submitBtn.disabled = false;
+                  if (data && data.access) window.location.reload();
                 }, 2500);
               })
               .catch(function(err) {

@@ -1,4 +1,7 @@
+from django.contrib.auth import login
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiExample
+from rest_framework import status
+from rest_framework.response import Response
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer, TokenRefreshSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -17,7 +20,11 @@ from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
     ],
 )
 class SmartCreditTokenObtainPairView(TokenObtainPairView):
-    pass
+    def post(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        login(request, serializer.user, backend="django.contrib.auth.backends.ModelBackend")
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
 
 @extend_schema(

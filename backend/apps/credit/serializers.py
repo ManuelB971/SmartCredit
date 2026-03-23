@@ -66,6 +66,7 @@ class OffreBancaireSerializer(serializers.ModelSerializer):
 
 class ResultatSimulationSerializer(serializers.ModelSerializer):
     offre_bancaire = OffreBancaireSerializer(allow_null=True)
+    montant_total_rembourse = serializers.SerializerMethodField()
 
     class Meta:
         model = ResultatSimulation
@@ -75,6 +76,7 @@ class ResultatSimulationSerializer(serializers.ModelSerializer):
             "mensualite",
             "taux_utilise",
             "cout_total",
+            "montant_total_rembourse",
             "taux_endettement",
             "reste_a_vivre",
             "score_faisabilite",
@@ -82,11 +84,23 @@ class ResultatSimulationSerializer(serializers.ModelSerializer):
             "offre_bancaire",
         ]
 
+    def get_montant_total_rembourse(self, obj):
+        capital = obj.simulation.projet_credit.montant_souhaite - obj.simulation.projet_credit.apport_personnel
+        return float(capital + obj.cout_total)
+
 
 class ExplicationIASerializer(serializers.ModelSerializer):
     class Meta:
         model = ExplicationIA
-        fields = ["texte_explication", "recommandations", "avertissements", "niveau_langage", "date_generation"]
+        fields = [
+            "texte_explication",
+            "recommandations",
+            "avertissements",
+            "resume_executif",
+            "donnees_enrichies",
+            "niveau_langage",
+            "date_generation",
+        ]
 
 
 class SimulationDetailSerializer(serializers.ModelSerializer):

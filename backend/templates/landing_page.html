@@ -1,110 +1,288 @@
 {% extends "base.html" %}
-{% block title %}Smart Crédit - Meilleur taux par IA{% endblock %}
+{% block title %}Smart Crédit — Meilleur taux crédit par IA{% endblock %}
+{% block extra_css %}
+<style>
+  @keyframes float { 0%, 100% { transform: translateY(0px) rotate(2deg); } 50% { transform: translateY(-12px) rotate(2deg); } }
+  @keyframes countUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+  .hero-card { animation: float 6s ease-in-out infinite; }
+  .stat-number { animation: countUp 0.6s ease forwards; }
+  .step-line::after { content: ''; position: absolute; left: 50%; top: 100%; width: 2px; height: 2rem; background: linear-gradient(to bottom, #006554, transparent); transform: translateX(-50%); }
+  .bank-badge { transition: all 0.2s ease; }
+  .bank-badge:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,101,84,0.12); }
+  .trust-bar { background: linear-gradient(135deg, #f6f3f2 0%, #ffffff 50%, #f6f3f2 100%); }
+</style>
+{% endblock %}
 {% block content %}
 <main class="min-h-screen">
-  <section class="relative pt-20 pb-32 px-6 overflow-hidden">
-    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
-      <div class="lg:col-span-7 z-10">
-        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-container/10 text-primary mb-6">
-          <span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-          <span class="text-xs font-bold uppercase tracking-widest">Technologie IA de pointe</span>
+
+  <!-- ===== HERO ===== -->
+  <section class="relative pt-16 pb-24 px-6 overflow-hidden">
+    <!-- Background glows -->
+    <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary/4 rounded-full blur-[120px] -z-10 translate-x-1/3 -translate-y-1/4"></div>
+    <div class="absolute bottom-0 left-0 w-[400px] h-[400px] bg-primary-fixed-dim/10 rounded-full blur-[100px] -z-10"></div>
+
+    <div class="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-center">
+      <!-- Left: Copy -->
+      <div class="lg:col-span-7 z-10 space-y-8">
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/8 border border-primary/15 text-primary">
+          <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          <span class="text-xs font-bold uppercase tracking-widest">IA Active · Mise à jour en temps réel</span>
         </div>
-        <h2 class="text-5xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-8 text-on-surface">
-          Trouvez le meilleur taux pour votre crédit en <span class="text-primary">3 minutes</span> grâce à l'IA
-        </h2>
-        <p class="text-lg text-on-surface-variant max-w-xl mb-10 leading-relaxed">
-          L'algorithme Smart Crédit analyse en temps réel les offres de 5 grandes banques pour vous garantir le financement le plus avantageux, sans frais cachés.
+        <h1 class="text-5xl lg:text-6xl xl:text-7xl font-extrabold tracking-tight leading-[1.05] text-on-surface">
+          Le meilleur taux<br>crédit, trouvé en<br><span class="text-primary">3&nbsp;minutes</span> par l'IA.
+        </h1>
+        <p class="text-xl text-on-surface-variant max-w-lg leading-relaxed">
+          Notre algorithme analyse les offres de <strong class="text-on-surface">5 grandes banques françaises</strong> en temps réel et génère votre score de financement personnalisé.
         </p>
-        <div class="flex flex-wrap gap-4">
-          <a href="/simulation/etape-1/?type=IMMOBILIER" class="bg-gradient-to-br from-primary to-primary-container text-white px-8 py-4 rounded-xl font-bold text-lg shadow-xl shadow-primary/10 active:scale-[0.98] transition-all">
-            Comparer les offres
+        <div class="flex flex-wrap gap-4 pt-2">
+          <a href="/simulation/etape-1/?type=IMMOBILIER"
+             class="group inline-flex items-center gap-3 bg-gradient-to-br from-primary to-primary-container text-white px-8 py-4 rounded-2xl font-bold text-lg shadow-xl shadow-primary/20 hover:shadow-2xl hover:shadow-primary/30 hover:scale-[1.02] active:scale-[0.98] transition-all duration-200">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">rocket_launch</span>
+            Lancer ma simulation
+            <span class="material-symbols-outlined text-white/70 group-hover:translate-x-1 transition-transform">arrow_forward</span>
           </a>
-          <a href="/simulation/etape-1/?type=IMMOBILIER" class="bg-surface-container-highest text-on-surface px-8 py-4 rounded-xl font-bold text-lg hover:opacity-90 transition-all">
-            Voir comment ça marche
+          <a href="#comment-ca-marche"
+             class="inline-flex items-center gap-2 bg-surface-container-highest text-on-surface px-8 py-4 rounded-2xl font-bold text-lg hover:bg-surface-container-high transition-colors">
+            <span class="material-symbols-outlined">play_circle</span>
+            Comment ça marche
           </a>
+        </div>
+        <!-- Trust signals -->
+        <div class="flex flex-wrap items-center gap-6 pt-2 text-sm text-on-surface-variant">
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">check_circle</span>100% gratuit, sans engagement</span>
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">lock</span>Données anonymisées</span>
+          <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">schedule</span>Résultat en moins de 60s</span>
         </div>
       </div>
-      <div class="lg:col-span-5 relative">
-        <div class="bg-white/80 backdrop-blur-2xl p-8 rounded-[2rem] shadow-[0_32px_64px_rgba(0,101,84,0.08)] relative z-20 transform lg:rotate-2">
-          <div class="flex items-center justify-between mb-8">
+
+      <!-- Right: Hero card -->
+      <div class="lg:col-span-5 relative flex justify-center">
+        <div class="hero-card bg-white/90 backdrop-blur-2xl p-8 rounded-[2rem] shadow-[0_40px_80px_rgba(0,101,84,0.10)] border border-white/80 w-full max-w-sm relative z-20">
+          <!-- Card header -->
+          <div class="flex items-center justify-between mb-6">
             <div>
-              <p class="text-sm font-bold text-on-surface-variant uppercase tracking-tighter">Économies moyennes</p>
-              <h3 class="text-4xl font-black text-primary">12 450 €</h3>
+              <p class="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-1">Simulation en cours</p>
+              <p class="text-sm font-medium text-on-surface">Crédit Immobilier · 20 ans</p>
             </div>
-            <div class="h-12 w-12 bg-primary/10 rounded-full flex items-center justify-center">
-              <span class="material-symbols-outlined text-primary">trending_down</span>
+            <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center">
+              <span class="material-symbols-outlined text-green-600 text-xl" style="font-variation-settings: 'FILL' 1;">verified</span>
             </div>
           </div>
-          <div class="space-y-6">
-            <div>
-              <div class="flex justify-between text-xs font-bold mb-2 uppercase text-on-surface-variant">
-                <span>Taux Marché</span><span>4.2%</span>
+          <!-- Rate comparison -->
+          <div class="space-y-4 mb-6">
+            <div class="p-4 rounded-xl bg-surface-container-low border border-outline-variant/20">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold uppercase text-on-surface-variant tracking-wide">Taux marché moyen</span>
+                <span class="text-base font-bold text-on-surface-variant">4,20 %</span>
               </div>
-              <div class="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
-                <div class="h-full bg-on-surface-variant/20 w-[80%] rounded-full"></div>
-              </div>
-            </div>
-            <div>
-              <div class="flex justify-between text-xs font-bold mb-2 uppercase text-primary">
-                <span>Taux Smart Crédit (IA)</span><span>3.15%</span>
-              </div>
-              <div class="h-3 w-full bg-primary-fixed-dim rounded-full overflow-hidden">
-                <div class="h-full bg-primary w-[65%] rounded-full"></div>
+              <div class="h-2 w-full bg-surface-container-highest rounded-full overflow-hidden">
+                <div class="h-full bg-on-surface-variant/25 rounded-full" style="width: 84%"></div>
               </div>
             </div>
+            <div class="p-4 rounded-xl bg-primary/5 border border-primary/20">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-bold uppercase text-primary tracking-wide">Taux Smart Crédit IA</span>
+                <span class="text-base font-bold text-primary">3,15 %</span>
+              </div>
+              <div class="h-3 w-full bg-primary-fixed-dim/30 rounded-full overflow-hidden">
+                <div class="h-full bg-gradient-to-r from-primary to-primary-container rounded-full transition-all" style="width: 63%"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Savings -->
+          <div class="bg-gradient-to-r from-primary/8 to-primary-container/5 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <p class="text-xs font-bold text-primary uppercase tracking-wide">Économies réalisées</p>
+              <p class="text-3xl font-black text-primary leading-tight">12 450 €</p>
+            </div>
+            <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">trending_down</span>
+          </div>
+          <!-- Scenario chips -->
+          <div class="flex gap-2 mt-4">
+            <span class="px-3 py-1 rounded-full bg-green-50 text-green-700 text-xs font-bold border border-green-100">Prudent 3.15%</span>
+            <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-700 text-xs font-bold border border-blue-100">Équilibré 3.50%</span>
+            <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-700 text-xs font-bold border border-orange-100">Confort 3.70%</span>
           </div>
         </div>
-        <div class="absolute -top-12 -right-12 w-64 h-64 bg-primary/5 rounded-full blur-3xl -z-10"></div>
-        <div class="absolute -bottom-8 -left-8 w-48 h-48 bg-secondary/5 rounded-full blur-2xl -z-10"></div>
+        <!-- Floating badge -->
+        <div class="absolute -bottom-4 -left-4 bg-white shadow-xl rounded-2xl p-4 flex items-center gap-3 border border-outline-variant/20 z-30">
+          <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+          </div>
+          <div>
+            <p class="text-xs font-bold text-on-surface">Score IA : 87/100</p>
+            <p class="text-xs text-on-surface-variant">Dossier solide ✓</p>
+          </div>
+        </div>
       </div>
     </div>
   </section>
-  <section class="bg-surface-container-low py-12">
-    <div class="max-w-7xl mx-auto px-6">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
-        <div class="flex items-center justify-center gap-4">
-          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">account_balance</span>
-          <span class="text-lg font-bold text-on-surface-variant">5 banques comparées</span>
+
+  <!-- ===== CHIFFRES CLÉS ===== -->
+  <section class="trust-bar border-y border-outline-variant/20 py-10">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+        <div class="space-y-1">
+          <p class="text-3xl font-black text-primary" data-count="2847" data-suffix="">2 847</p>
+          <p class="text-sm font-medium text-on-surface-variant">Simulations réalisées</p>
         </div>
-        <div class="flex items-center justify-center gap-4">
-          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
-          <span class="text-lg font-bold text-on-surface-variant">Propulsé par l'IA</span>
+        <div class="space-y-1">
+          <p class="text-3xl font-black text-primary" data-count="12450" data-prefix="€" data-suffix="">12 450 €</p>
+          <p class="text-sm font-medium text-on-surface-variant">Économies moyennes</p>
         </div>
-        <div class="flex items-center justify-center gap-4">
-          <span class="material-symbols-outlined text-primary text-3xl" style="font-variation-settings: 'FILL' 1;">verified_user</span>
-          <span class="text-lg font-bold text-on-surface-variant">100% Gratuit</span>
+        <div class="space-y-1">
+          <p class="text-3xl font-black text-primary">5</p>
+          <p class="text-sm font-medium text-on-surface-variant">Banques comparées</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-3xl font-black text-primary">3 min</p>
+          <p class="text-sm font-medium text-on-surface-variant">Durée moyenne</p>
         </div>
       </div>
     </div>
   </section>
-  <section class="py-32 px-6 max-w-7xl mx-auto">
-    <h2 class="text-4xl font-bold tracking-tight mb-16">Quel projet souhaitez-vous financer ?</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
-      <a href="/simulation/etape-1/?type=IMMOBILIER" class="group relative bg-surface-container-lowest p-10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:bg-surface-container-low cursor-pointer block">
-        <div class="absolute top-0 right-0 p-8">
-          <span class="material-symbols-outlined text-primary/10 text-9xl transform translate-x-12 -translate-y-8 group-hover:scale-110 transition-transform">home</span>
+
+  <!-- ===== BANQUES PARTENAIRES ===== -->
+  <section class="py-14 px-6 bg-surface">
+    <div class="max-w-5xl mx-auto">
+      <p class="text-center text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-8">Offres comparées en temps réel</p>
+      <div class="flex flex-wrap justify-center gap-4">
+        {% for name in bank_list %}
+        <div class="bank-badge bg-surface-container-lowest border border-outline-variant/20 rounded-2xl px-6 py-3 flex items-center gap-3 shadow-sm cursor-default">
+          <div class="w-8 h-8 rounded-lg bg-primary/8 flex items-center justify-center">
+            <span class="material-symbols-outlined text-primary text-base" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+          </div>
+          <span class="font-bold text-on-surface text-sm">{{ name }}</span>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== COMMENT ÇA MARCHE ===== -->
+  <section id="comment-ca-marche" class="py-28 px-6 bg-surface-container-low">
+    <div class="max-w-5xl mx-auto">
+      <div class="text-center mb-16 space-y-4">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-primary/8 text-primary text-xs font-bold uppercase tracking-widest border border-primary/15">Processus</span>
+        <h2 class="text-4xl lg:text-5xl font-extrabold tracking-tight text-on-surface">Obtenez votre analyse<br>en 3 étapes simples</h2>
+        <p class="text-lg text-on-surface-variant max-w-lg mx-auto">Aucun document requis. Juste quelques informations et notre IA s'occupe du reste.</p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 relative">
+        <!-- Step 1 -->
+        <div class="bg-surface-container-lowest rounded-3xl p-8 border border-outline-variant/15 shadow-sm hover:shadow-md transition-shadow relative group">
+          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">person</span>
+          </div>
+          <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary text-white text-sm font-black flex items-center justify-center shadow-md">1</div>
+          <h3 class="text-xl font-bold text-on-surface mb-3">Votre profil</h3>
+          <p class="text-on-surface-variant leading-relaxed">Renseignez votre situation familiale, vos revenus mensuels et vos charges actuelles.</p>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Situation familiale</span>
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Revenus</span>
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Charges</span>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="hidden md:flex items-center justify-center absolute left-[33%] top-1/2 -translate-y-1/2 w-[8%]">
+          <span class="material-symbols-outlined text-primary/30 text-3xl">arrow_forward</span>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="bg-surface-container-lowest rounded-3xl p-8 border border-outline-variant/15 shadow-sm hover:shadow-md transition-shadow relative group">
+          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">home</span>
+          </div>
+          <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-primary text-white text-sm font-black flex items-center justify-center shadow-md">2</div>
+          <h3 class="text-xl font-bold text-on-surface mb-3">Votre projet</h3>
+          <p class="text-on-surface-variant leading-relaxed">Définissez le montant, la durée et le type de crédit souhaité (immobilier ou étudiant).</p>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Montant</span>
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Durée</span>
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Apport</span>
+          </div>
+        </div>
+
+        <!-- Connector -->
+        <div class="hidden md:flex items-center justify-center absolute left-[66%] top-1/2 -translate-y-1/2 w-[8%]">
+          <span class="material-symbols-outlined text-primary/30 text-3xl">arrow_forward</span>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="bg-surface-container-lowest rounded-3xl p-8 border border-primary/20 shadow-sm hover:shadow-md transition-shadow relative group ring-1 ring-primary/10">
+          <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary to-primary-container flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+            <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+          </div>
+          <div class="absolute -top-3 -right-3 w-8 h-8 rounded-full bg-gradient-to-br from-primary to-primary-container text-white text-sm font-black flex items-center justify-center shadow-md">3</div>
+          <h3 class="text-xl font-bold text-on-surface mb-3">L'IA analyse</h3>
+          <p class="text-on-surface-variant leading-relaxed">Notre IA calcule votre score, compare les banques et génère 3 scénarios personnalisés en temps réel.</p>
+          <div class="mt-6 flex flex-wrap gap-2">
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Score 0-100</span>
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">3 scénarios</span>
+            <span class="text-xs bg-primary/8 text-primary px-3 py-1 rounded-full font-medium">Recommandations</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== TYPES DE CRÉDIT ===== -->
+  <section class="py-28 px-6 max-w-7xl mx-auto">
+    <div class="text-center mb-16 space-y-4">
+      <span class="inline-block px-4 py-1.5 rounded-full bg-primary/8 text-primary text-xs font-bold uppercase tracking-widest border border-primary/15">Nos solutions</span>
+      <h2 class="text-4xl font-bold tracking-tight text-on-surface">Quel projet souhaitez-vous financer ?</h2>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Immobilier -->
+      <a href="/simulation/etape-1/?type=IMMOBILIER" class="group relative bg-surface-container-lowest p-10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/8 border border-outline-variant/15 hover:border-primary/20 block">
+        <div class="absolute top-0 right-0 p-8 pointer-events-none">
+          <span class="material-symbols-outlined text-primary/8 text-[10rem] transform translate-x-10 -translate-y-6 group-hover:scale-110 group-hover:text-primary/12 transition-all duration-500">home</span>
         </div>
         <div class="relative z-10">
-          <div class="w-16 h-16 bg-primary-container/10 rounded-2xl flex items-center justify-center mb-8">
+          <div class="w-16 h-16 bg-primary/8 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary/15 transition-colors">
             <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">home</span>
           </div>
-          <h3 class="text-3xl font-bold mb-4">Crédit Immobilier</h3>
-          <p class="text-on-surface-variant mb-8 text-lg max-w-xs">Devenez propriétaire avec le meilleur taux du marché immobilier actuel.</p>
+          <h3 class="text-3xl font-bold mb-3">Crédit Immobilier</h3>
+          <p class="text-on-surface-variant mb-6 text-lg max-w-xs leading-relaxed">Devenez propriétaire avec le meilleur taux du marché. Dès 3,15% sur 20 ans.</p>
+          <div class="flex items-center gap-6 mb-8 text-sm">
+            <div>
+              <p class="font-bold text-on-surface text-xl">3,15%</p>
+              <p class="text-on-surface-variant text-xs">Meilleur taux actuel</p>
+            </div>
+            <div class="w-px h-10 bg-outline-variant/30"></div>
+            <div>
+              <p class="font-bold text-on-surface text-xl">25 ans</p>
+              <p class="text-on-surface-variant text-xs">Durée max comparée</p>
+            </div>
+          </div>
           <span class="inline-flex items-center text-primary font-bold gap-2 group-hover:gap-4 transition-all">
             Commencer ma simulation <span class="material-symbols-outlined">arrow_forward</span>
           </span>
         </div>
       </a>
-      <a href="/simulation/etape-1/?type=ETUDIANT" class="group relative bg-surface-container-lowest p-10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:bg-surface-container-low cursor-pointer block">
-        <div class="absolute top-0 right-0 p-8">
-          <span class="material-symbols-outlined text-primary/10 text-9xl transform translate-x-12 -translate-y-8 group-hover:scale-110 transition-transform">school</span>
+
+      <!-- Étudiant -->
+      <a href="/simulation/etape-1/?type=ETUDIANT" class="group relative bg-surface-container-lowest p-10 rounded-[2.5rem] overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-primary/8 border border-outline-variant/15 hover:border-primary/20 block">
+        <div class="absolute top-0 right-0 p-8 pointer-events-none">
+          <span class="material-symbols-outlined text-primary/8 text-[10rem] transform translate-x-10 -translate-y-6 group-hover:scale-110 group-hover:text-primary/12 transition-all duration-500">school</span>
         </div>
         <div class="relative z-10">
-          <div class="w-16 h-16 bg-primary-container/10 rounded-2xl flex items-center justify-center mb-8">
+          <div class="w-16 h-16 bg-primary/8 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-primary/15 transition-colors">
             <span class="material-symbols-outlined text-primary text-4xl" style="font-variation-settings: 'FILL' 1;">school</span>
           </div>
-          <h3 class="text-3xl font-bold mb-4">Crédit Étudiant</h3>
-          <p class="text-on-surface-variant mb-8 text-lg max-w-xs">Financez vos études sereinement avec des taux préférentiels négociés.</p>
+          <h3 class="text-3xl font-bold mb-3">Crédit Étudiant</h3>
+          <p class="text-on-surface-variant mb-6 text-lg max-w-xs leading-relaxed">Financez vos études sereinement avec des taux préférentiels. Différé de remboursement possible.</p>
+          <div class="flex items-center gap-6 mb-8 text-sm">
+            <div>
+              <p class="font-bold text-on-surface text-xl">0,80%</p>
+              <p class="text-on-surface-variant text-xs">Meilleur taux étudiant</p>
+            </div>
+            <div class="w-px h-10 bg-outline-variant/30"></div>
+            <div>
+              <p class="font-bold text-on-surface text-xl">70 000 €</p>
+              <p class="text-on-surface-variant text-xs">Montant max financé</p>
+            </div>
+          </div>
           <span class="inline-flex items-center text-primary font-bold gap-2 group-hover:gap-4 transition-all">
             Estimer mes mensualités <span class="material-symbols-outlined">arrow_forward</span>
           </span>
@@ -112,19 +290,99 @@
       </a>
     </div>
   </section>
-  <section class="py-32 px-6 text-center">
-    <div class="max-w-3xl mx-auto">
-      <h2 class="text-4xl lg:text-5xl font-black mb-8">Prêt à économiser sur votre crédit ?</h2>
-      <p class="text-xl text-on-surface-variant mb-12">Sans engagement, 100% en ligne, et traité en priorité par nos partenaires bancaires.</p>
-      <a href="/simulation/etape-1/?type=IMMOBILIER" class="inline-block bg-gradient-to-br from-primary to-primary-container text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-        Lancer mon analyse IA
-      </a>
+
+  <!-- ===== FONCTIONNALITÉS IA ===== -->
+  <section class="py-24 px-6 bg-surface-container-low">
+    <div class="max-w-6xl mx-auto">
+      <div class="text-center mb-16 space-y-4">
+        <span class="inline-block px-4 py-1.5 rounded-full bg-primary/8 text-primary text-xs font-bold uppercase tracking-widest border border-primary/15">Technologie</span>
+        <h2 class="text-4xl font-bold tracking-tight text-on-surface">Une IA au service de votre financement</h2>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/15 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-blue-600 text-2xl" style="font-variation-settings: 'FILL' 1;">psychology</span>
+          </div>
+          <h4 class="text-lg font-bold">Score IA personnalisé</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Un score de 0 à 100 calculé sur votre taux d'endettement, reste à vivre et stabilité professionnelle.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/15 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-green-600 text-2xl" style="font-variation-settings: 'FILL' 1;">balance</span>
+          </div>
+          <h4 class="text-lg font-bold">3 scénarios comparés</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Prudent, Équilibré, Confort — trois approches bancaires pour choisir la stratégie adaptée à vos objectifs.</p>
+        </div>
+        <div class="bg-surface-container-lowest p-8 rounded-3xl border border-outline-variant/15 space-y-4">
+          <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center">
+            <span class="material-symbols-outlined text-purple-600 text-2xl" style="font-variation-settings: 'FILL' 1;">tips_and_updates</span>
+          </div>
+          <h4 class="text-lg font-bold">Recommandations concrètes</h4>
+          <p class="text-on-surface-variant text-sm leading-relaxed">Conseils personnalisés sur votre apport, durée optimale et actions pour améliorer votre dossier.</p>
+        </div>
+      </div>
     </div>
   </section>
+
+  <!-- ===== CTA FINAL ===== -->
+  <section class="py-28 px-6 text-center relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-b from-transparent to-primary/3 -z-10"></div>
+    <div class="max-w-3xl mx-auto space-y-8">
+      <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/8 text-primary text-xs font-bold uppercase tracking-widest border border-primary/15">
+        <span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+        Analyse disponible 24h/7j
+      </span>
+      <h2 class="text-4xl lg:text-5xl font-black tracking-tight text-on-surface">Prêt à trouver votre meilleur taux ?</h2>
+      <p class="text-xl text-on-surface-variant leading-relaxed">Sans rendez-vous bancaire, sans dossier papier. 100% en ligne, résultat instantané.</p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="/simulation/etape-1/?type=IMMOBILIER"
+           class="inline-flex items-center justify-center gap-3 bg-gradient-to-br from-primary to-primary-container text-white px-12 py-5 rounded-2xl font-bold text-xl shadow-2xl shadow-primary/20 hover:scale-105 active:scale-95 transition-all duration-200">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+          Crédit Immobilier
+        </a>
+        <a href="/simulation/etape-1/?type=ETUDIANT"
+           class="inline-flex items-center justify-center gap-3 bg-surface-container-lowest border-2 border-primary text-primary px-12 py-5 rounded-2xl font-bold text-xl hover:bg-primary/5 active:scale-95 transition-all duration-200">
+          <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">school</span>
+          Crédit Étudiant
+        </a>
+      </div>
+    </div>
+  </section>
+
 </main>
-<footer class="bg-surface-dim py-16 px-6">
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-on-surface py-16 px-6">
   <div class="max-w-7xl mx-auto">
-    <p class="text-on-surface-variant/60 text-sm text-center">© 2026 Smart Crédit. Tous droits réservés.</p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-12 mb-12">
+      <div>
+        <div class="flex items-center gap-2 mb-4">
+          <span class="material-symbols-outlined text-primary-fixed-dim" style="font-variation-settings: 'FILL' 1;">account_balance</span>
+          <span class="text-xl font-bold text-white tracking-tighter">Smart Crédit</span>
+        </div>
+        <p class="text-white/50 text-sm leading-relaxed">Simulateur de crédit intelligent propulsé par l'intelligence artificielle.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-widest">Simulateurs</h4>
+        <ul class="space-y-2 text-white/50 text-sm">
+          <li><a href="/simulation/etape-1/?type=IMMOBILIER" class="hover:text-white/80 transition-colors">Crédit Immobilier</a></li>
+          <li><a href="/simulation/etape-1/?type=ETUDIANT" class="hover:text-white/80 transition-colors">Crédit Étudiant</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-bold mb-4 text-sm uppercase tracking-widest">Compte</h4>
+        <ul class="space-y-2 text-white/50 text-sm">
+          <li><a href="/connexion/" class="hover:text-white/80 transition-colors">Connexion</a></li>
+          <li><a href="/inscription/" class="hover:text-white/80 transition-colors">Créer un compte</a></li>
+          <li><a href="/api/swagger/" class="hover:text-white/80 transition-colors">Documentation API</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <p class="text-white/40 text-sm">© 2026 Smart Crédit. Tous droits réservés.</p>
+      <p class="text-white/30 text-xs">Simulation à titre indicatif — Non contractuel</p>
+    </div>
   </div>
 </footer>
+
 {% endblock %}

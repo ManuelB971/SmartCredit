@@ -50,8 +50,17 @@
         <h1 class="text-xl font-bold text-[#006554] dark:text-[#0c806b] tracking-tighter">Smart Crédit</h1>
       </a>
       <div class="flex items-center gap-3">
+        <a href="/mon-compte/" class="text-[#3e4945] dark:text-[#bdc9c4] hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors px-4 py-2 rounded-lg font-medium flex items-center gap-2">
+          <span class="material-symbols-outlined text-lg">history</span>
+          <span class="hidden sm:inline">Mes simulations</span>
+        </a>
+        {% if request.user.is_authenticated %}
+        <span class="text-[#3e4945] dark:text-[#bdc9c4] font-medium hidden md:inline">{{ request.user.prenom }} {{ request.user.nom }}</span>
+        <form method="post" action="/deconnexion/">{% csrf_token %}<button type="submit" class="text-[#3e4945] dark:text-[#bdc9c4] hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors px-4 py-2 rounded-lg font-medium">Déconnexion</button></form>
+        {% else %}
         <a href="/connexion/" class="text-[#3e4945] dark:text-[#bdc9c4] hover:bg-[#f6f3f2] dark:hover:bg-[#2a2928] transition-colors px-4 py-2 rounded-lg font-medium">Connexion</a>
         <a href="/inscription/" class="bg-primary text-white px-4 py-2 rounded-lg font-medium hover:opacity-90 transition-opacity">Création de compte</a>
+        {% endif %}
       </div>
     </div>
   </header>

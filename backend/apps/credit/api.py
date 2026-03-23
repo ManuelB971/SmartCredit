@@ -1,11 +1,22 @@
-import random
 from decimal import Decimal
 
 from drf_spectacular.utils import extend_schema, OpenApiExample, OpenApiResponse
+
+# Villes en zone tendue (PTZ, Action Logement, etc.)
+_ZONES_TENDUES = ("paris", "lyon", "marseille", "bordeaux", "toulouse", "lille", "nice", "nantes", "strasbourg", "montpellier")
+
+
+def _ville_zone_tendue(ville: str | None) -> bool:
+    if not ville or not ville.strip():
+        return False
+    v = ville.strip().lower()
+    return any(z in v for z in _ZONES_TENDUES)
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
+from django.db.models import Prefetch
 
 from .models import (
     Simulation,
@@ -107,7 +118,14 @@ def get_simulation(request, simulation_id: int):
     try:
         sim = (
             Simulation.objects.select_related("profil_financier", "projet_credit")
-            .prefetch_related("resultats__offre_bancaire__banque")
+            .prefetch_related(
+                Prefetch(
+                    "resultats",
+                    queryset=ResultatSimulation.objects.select_related("simulation__projet_credit").prefetch_related(
+                        "offre_bancaire__banque"
+                    ),
+                )
+            )
             .get(id=simulation_id)
         )
     except Simulation.DoesNotExist:
@@ -154,10 +172,24 @@ def calculate_simulation(request, simulation_id: int):
     if not offres:
         return Response({"error": "Aucune offre bancaire disponible pour ces paramètres"}, status=409)
 
+    # Sélection avec banques distinctes : PRUDENT = meilleur taux, EQUILIBRE = 2e banque distincte, CONFORT = 3e ou dernière
+    seen_banques = set()
+    selected = []
+    for o in offres:
+        bid = o.banque_id
+        if bid not in seen_banques:
+            seen_banques.add(bid)
+            selected.append(o)
+            if len(selected) >= 3:
+                break
+    if len(selected) == 1:
+        selected.append(offres[len(offres) // 2] if len(offres) > 1 else offres[0])
+    if len(selected) == 2:
+        selected.append(offres[-1] if offres[-1] not in selected else offres[len(offres) // 2])
     offers_for_scenarios = {
-        ScenarioResultat.PRUDENT: offres[0],
-        ScenarioResultat.EQUILIBRE: offres[len(offres) // 2],
-        ScenarioResultat.CONFORT: offres[-1],
+        ScenarioResultat.PRUDENT: selected[0],
+        ScenarioResultat.EQUILIBRE: selected[1] if len(selected) > 1 else offres[len(offres) // 2],
+        ScenarioResultat.CONFORT: selected[2] if len(selected) > 2 else offres[-1],
     }
 
     capital = sim.projet_credit.montant_souhaite - sim.projet_credit.apport_personnel
@@ -178,32 +210,56 @@ def calculate_simulation(request, simulation_id: int):
     te_ref = calc_te(charges=charges_existantes + m_ref, revenus=revenus)
     rav_ref = revenus - charges_existantes - m_ref
 
+    # Pré-calcul des 3 scénarios pour offres_comparees
+    offres_comparees = []
+    for scenario, offre in offers_for_scenarios.items():
+        taux_d = Decimal(offre.taux_annuel) / Decimal(100)
+        m = calc_mensualite(capital=capital, taux_annuel=taux_d, n_mois=sim.projet_credit.duree_mois)
+        ct = calc_cout_total(mensualite_val=m, n_mois=sim.projet_credit.duree_mois, capital=capital)
+        offres_comparees.append({
+            "scenario": scenario,
+            "banque": offre.banque.nom,
+            "taux_annuel": str(offre.taux_annuel),
+            "mensualite": round(float(m), 2),
+            "cout_total_interets": round(float(ct), 2),
+        })
+
     # IA (Ollama) — fallback si indispo
     ai_score: int | None = None
     ai_text: str | None = None
     ai_reco: str | None = None
     ai_warn: str | None = None
+    ai_resume = ""
+    ai_donnees: dict = {}
     ai_status = "fallback"
     ai_error: str | None = None
     try:
+        montant_f_ref = float(sim.projet_credit.montant_souhaite)
+        apport_ratio_pct = round(float(sim.projet_credit.apport_personnel) / montant_f_ref * 100, 1) if montant_f_ref > 0 else 0
         prompt = build_scoring_prompt(
             {
                 "type_credit": sim.type_credit,
                 "duree_mois": sim.projet_credit.duree_mois,
+                "duree_annees": round(sim.projet_credit.duree_mois / 12, 1),
                 "montant_souhaite": str(sim.projet_credit.montant_souhaite),
                 "apport_personnel": str(sim.projet_credit.apport_personnel),
+                "apport_ratio_pct": apport_ratio_pct,
                 "capital_emprunte": str(capital),
-                "revenus": str(revenus),
+                "revenus_mensuels_nets": str(revenus),
                 "charges_existantes": str(charges_existantes),
-                "taux_endettement_ref": str(te_ref),
-                "reste_a_vivre_ref": str(rav_ref),
-                "mensualite_ref": str(m_ref),
-                "cout_total_ref": str(ct_ref),
-                "offre_ref": {
-                    "banque": offre_ref.banque.nom,
-                    "taux_annuel": str(offre_ref.taux_annuel),
-                    "date_mise_a_jour": offre_ref.date_mise_a_jour.isoformat(),
-                },
+                "taux_endettement_pct": round(float(te_ref), 2),
+                "reste_a_vivre_mensuel": round(float(rav_ref), 2),
+                "mensualite_prudent": round(float(m_ref), 2),
+                "cout_total_interets_prudent": round(float(ct_ref), 2),
+                "age": sim.profil_financier.age,
+                "situation_familiale": sim.profil_financier.situation_familiale,
+                "nombre_enfants": sim.profil_financier.nombre_enfants,
+                "type_contrat": sim.profil_financier.type_contrat,
+                "anciennete_emploi_mois": sim.profil_financier.anciennete_emploi_mois,
+                "ville": sim.profil_financier.ville or "",
+                "zone_tendue": _ville_zone_tendue(sim.profil_financier.ville),
+                "meilleur_taux_disponible": str(offre_ref.taux_annuel),
+                "offres_comparees": offres_comparees,
             }
         )
         raw = ollama_generate(prompt)
@@ -212,6 +268,12 @@ def calculate_simulation(request, simulation_id: int):
         ai_text = decision.texte_explication
         ai_reco = decision.recommandations
         ai_warn = decision.avertissements
+        ai_resume = decision.resume_executif or ""
+        ai_donnees = {
+            "points_forts_dossier": decision.points_forts_dossier,
+            "risques_identifies": decision.risques_identifies,
+            "prochaines_etapes": decision.prochaines_etapes,
+        }
         ai_status = "ok"
     except (OllamaError, AiParseError) as e:
         ai_status = "fallback"
@@ -224,13 +286,48 @@ def calculate_simulation(request, simulation_id: int):
         te = calc_te(charges=charges_existantes + m, revenus=revenus)
         rav = revenus - charges_existantes - m
 
-        score = None
+        score = 0
         if revenus > 0:
+            te_f = float(te)
+            rav_f = float(rav)
             score = 100
-            if te > Decimal("35.00"):
-                score = 35
-            if rav < Decimal("800.00"):
-                score = min(score, 45)
+            # Taux d'endettement
+            if te_f > 40:
+                score -= 55
+            elif te_f > 35:
+                score -= 40
+            elif te_f > 33:
+                score -= 20
+            elif te_f > 28:
+                score -= 8
+            # Reste à vivre
+            if rav_f < 600:
+                score -= 30
+            elif rav_f < 800:
+                score -= 20
+            elif rav_f < 1000:
+                score -= 10
+            elif rav_f < 1200:
+                score -= 4
+            # Apport personnel
+            montant_f = float(sim.projet_credit.montant_souhaite)
+            if montant_f > 0:
+                apport_ratio = float(sim.projet_credit.apport_personnel) / montant_f
+                if apport_ratio < 0.05:
+                    score -= 12
+                elif apport_ratio < 0.10:
+                    score -= 7
+                elif apport_ratio < 0.20:
+                    score -= 3
+            # Stabilité professionnelle
+            if sim.profil_financier.type_contrat in ("CDD", "INDEPENDANT"):
+                score -= 8
+            anc = sim.profil_financier.anciennete_emploi_mois
+            if anc < 6:
+                score -= 8
+            elif anc < 24:
+                score -= 4
+            score = max(5, min(100, score))
         if ai_score is not None:
             score = ai_score
 
@@ -261,40 +358,25 @@ def calculate_simulation(request, simulation_id: int):
     taux_str = str(offre_ref.taux_annuel).replace(".", ",")
 
     if te_val > 40 and rav_val < 1000:
-        explications = [
+        fallback_text = (
             f"Votre taux d'endettement ({te_val:.1f} %) et votre reste à vivre ({rav_val:.0f} €) rendent le dossier délicat. "
-            f"Parmi les offres comparées, le meilleur taux trouvé est de {taux_str} %. Une consolidation du dossier serait bénéfique.",
-            f"Avec {te_val:.1f} % d'endettement et environ {rav_val:.0f} € de reste à vivre, les banques pourraient être exigeantes. "
-            f"Nous avons identifié des offres à partir de {taux_str} %. Des ajustements sont possibles.",
-        ]
+            f"Parmi les offres comparées, le meilleur taux trouvé est de {taux_str} %. Une consolidation du dossier serait bénéfique."
+        )
     elif te_val > 35:
-        explications = [
+        fallback_text = (
             f"Votre taux d'endettement ({te_val:.1f} %) frôle la limite habituelle des 35 %. "
-            f"Reste à vivre : environ {rav_val:.0f} €. Le meilleur taux parmi les offres analysées : {taux_str} %.",
-            f"Dossier à la limite : {te_val:.1f} % d'endettement, reste à vivre {rav_val:.0f} €. "
-            f"Les offres les plus compétitives démarrent à {taux_str} %. Un peu plus d'apport ou une durée plus longue pourrait aider.",
-        ]
+            f"Reste à vivre : environ {rav_val:.0f} €. Le meilleur taux parmi les offres analysées : {taux_str} %."
+        )
     else:
-        explications = [
+        fallback_text = (
             f"Votre profil est cohérent : taux d'endettement autour de {te_val:.1f} %, reste à vivre d'environ {rav_val:.0f} €. "
-            f"Parmi les offres comparées, nous avons trouvé des taux à partir de {taux_str} %.",
-            f"Les chiffres sont encourageants — endettement à {te_val:.1f} %, reste à vivre ~{rav_val:.0f} €. "
-            f"Votre meilleure option parmi nos partenaires affiche un taux de {taux_str} %. Les taux restent indicatifs.",
-        ]
-    fallback_text = random.choice(explications)
+            f"Parmi les offres comparées, nous avons trouvé des taux à partir de {taux_str} %."
+        )
 
     if te_val > 35 or rav_val < 800:
-        reco_list = [
-            "Augmentez l'apport personnel pour réduire le capital emprunté et rassurer les banques.",
-            "Envisagez d'allonger la durée du crédit pour diminuer la mensualité et le taux d'endettement.",
-            "Réduisez les charges existantes si possible (rachat de crédits, renégociation) avant de reposter.",
-        ]
+        fallback_reco = "Augmentez l'apport personnel ou allongez la durée du crédit pour réduire votre taux d'endettement."
     else:
-        reco_list = [
-            "Comparez les offres détaillées auprès de nos partenaires pour affiner votre choix.",
-            "Un courtier ou votre banque pourra valider ces taux et finaliser votre dossier.",
-        ]
-    fallback_reco = random.choice(reco_list)
+        fallback_reco = "Comparez les offres détaillées auprès de nos partenaires pour affiner votre choix. Un courtier peut également valider votre dossier."
 
     fallback_warn = "Ce résultat est indicatif et ne constitue pas une offre contractuelle. Consultez un conseiller pour valider votre situation."
 
@@ -304,6 +386,8 @@ def calculate_simulation(request, simulation_id: int):
             "texte_explication": ai_text or fallback_text,
             "recommandations": ai_reco or fallback_reco,
             "avertissements": ai_warn or fallback_warn,
+            "resume_executif": ai_resume,
+            "donnees_enrichies": ai_donnees,
         },
     )
 

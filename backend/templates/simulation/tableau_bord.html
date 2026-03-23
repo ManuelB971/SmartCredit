@@ -6,101 +6,395 @@
   .glass-card { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(24px); }
   .asymmetric-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 2rem; }
   @media (max-width: 1024px) { .asymmetric-grid { grid-template-columns: 1fr; } }
+  @keyframes scoreIn { from { stroke-dashoffset: 264; } to { stroke-dashoffset: var(--target-offset); } }
+  .score-animate { animation: scoreIn 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+  .scenario-card { transition: all 0.2s ease; }
+  .scenario-card:hover { transform: translateY(-2px); }
 </style>
 {% endblock %}
 {% block content %}
 <main class="max-w-7xl mx-auto px-6 py-12 pb-32" id="tableau-bord-content" data-simulation-id="{{ simulation_id }}">
+
+  <!-- Loading state -->
   <div class="animate-pulse space-y-6" id="loading-state">
-    <div class="h-8 bg-surface-container-high rounded w-1/3"></div>
-    <div class="h-32 bg-surface-container-low rounded"></div>
+    <div class="h-8 bg-surface-container-high rounded-xl w-1/3"></div>
+    <div class="h-32 bg-surface-container-low rounded-2xl"></div>
     <div class="grid grid-cols-3 gap-4">
-      <div class="h-48 bg-surface-container-low rounded"></div>
-      <div class="h-48 bg-surface-container-low rounded"></div>
-      <div class="h-48 bg-surface-container-low rounded"></div>
+      <div class="h-48 bg-surface-container-low rounded-2xl"></div>
+      <div class="h-48 bg-surface-container-low rounded-2xl"></div>
+      <div class="h-48 bg-surface-container-low rounded-2xl"></div>
     </div>
   </div>
-  <div id="results-state" class="hidden">
-    <section class="mb-12">
+
+  <!-- Results state -->
+  <div id="results-state" class="hidden space-y-12">
+
+    <!-- Alerte zone tendue -->
+    <div id="alerte-zone-tendue" class="hidden p-4 rounded-xl bg-blue-50 border border-blue-200 flex items-start gap-3">
+      <span class="material-symbols-outlined text-blue-600 shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">info</span>
+      <div>
+        <p class="font-bold text-blue-800 text-sm">Dispositifs d'aide en zone tendue</p>
+        <p class="text-sm text-blue-700 mt-0.5">À <span id="alerte-ville"></span>, des dispositifs comme le PTZ ou Action Logement peuvent compléter votre financement. Renseignez-vous auprès de votre conseiller.</p>
+      </div>
+    </div>
+
+    <!-- Header -->
+    <section>
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div class="space-y-2">
-          <span class="inline-block px-3 py-1 bg-primary-container/10 text-primary font-label text-xs font-bold tracking-widest uppercase rounded-full">Analyse IA terminée</span>
-          <h2 class="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-on-surface">Vos opportunités de financement.</h2>
-          <p class="text-on-surface-variant max-w-xl text-lg">Basé sur votre profil financier, nous avons identifié les meilleures options pour votre projet.</p>
+        <div class="space-y-3">
+          <span class="inline-block px-3 py-1 bg-primary/8 text-primary font-label text-xs font-bold tracking-widest uppercase rounded-full border border-primary/15">Analyse IA terminée</span>
+          <h2 class="text-4xl md:text-5xl font-headline font-extrabold tracking-tight text-on-surface">Vos opportunités<br>de financement.</h2>
+          <p class="text-on-surface-variant max-w-xl text-lg">Basé sur votre profil financier, voici les meilleures options identifiées pour votre projet.</p>
         </div>
-        <div id="best-rate-card" class="bg-surface-container-lowest rounded-xl p-6 shadow-[0_12px_32px_rgba(0,101,84,0.06)] border border-outline-variant/20 flex items-center gap-6 min-w-[320px]">
-          <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center">
-            <span class="material-symbols-outlined text-blue-600 text-3xl">trending_down</span>
+        <div id="best-rate-card" class="bg-gradient-to-br from-primary/6 to-primary/3 rounded-2xl p-6 border border-primary/15 flex items-center gap-6 min-w-[300px]">
+          <div class="w-14 h-14 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <span class="material-symbols-outlined text-white text-2xl" style="font-variation-settings: 'FILL' 1;">trending_down</span>
           </div>
           <div>
-            <p class="text-xs font-label text-on-surface-variant font-bold uppercase tracking-tighter mb-1">Meilleur Taux Trouvé</p>
-            <p id="best-taux" class="text-3xl font-headline font-extrabold text-blue-600 tracking-tighter leading-none">— %</p>
-            <p id="best-banque" class="text-sm font-medium text-on-surface">—</p>
+            <p class="text-xs font-label text-on-surface-variant font-bold uppercase tracking-widest mb-1">Meilleur Taux Trouvé</p>
+            <p id="best-taux" class="text-4xl font-headline font-extrabold text-primary tracking-tighter leading-none">— %</p>
+            <p id="best-banque" class="text-sm font-medium text-on-surface mt-1">—</p>
           </div>
         </div>
       </div>
     </section>
+
+    <!-- Main grid: Scenarios + Score -->
     <div class="asymmetric-grid">
-      <div class="space-y-8">
-        <h3 class="text-xl font-headline font-bold text-on-surface flex items-center gap-2">
+      <!-- LEFT: Scenarios -->
+      <div class="space-y-6">
+        <h3 class="text-xl font-headline font-bold text-on-surface flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">compare</span>
           Scénarios de financement
-          <span class="h-px flex-1 bg-outline-variant/20 ml-4"></span>
+          <span class="h-px flex-1 bg-outline-variant/20 ml-2"></span>
         </h3>
         <div id="scenarios-container" class="grid grid-cols-1 gap-4"></div>
       </div>
-      <div class="space-y-8">
-        <div class="bg-surface-container-low rounded-xl p-8 border border-outline-variant/10 relative overflow-hidden">
-          <div class="flex flex-col items-center text-center">
-            <h3 class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-8">Score de Financement IA</h3>
-            <div class="relative w-48 h-48 mb-6">
-              <svg class="w-full h-full" viewBox="0 0 100 100">
-                <circle class="text-surface-container-highest stroke-current" cx="50" cy="50" fill="transparent" r="42" stroke-width="8"></circle>
-                <circle id="score-circle" class="text-primary stroke-current" cx="50" cy="50" fill="transparent" r="42" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" stroke-width="8" transform="rotate(-90 50 50)"></circle>
+
+      <!-- RIGHT: Score + AI -->
+      <div class="space-y-6">
+        <!-- Score gauge -->
+        <div class="bg-surface-container-low rounded-2xl p-8 border border-outline-variant/10 relative overflow-hidden">
+          <div id="score-glow" class="absolute -top-10 -right-10 w-48 h-48 rounded-full blur-3xl opacity-15 transition-colors duration-700" style="background:#006554"></div>
+          <div class="flex flex-col items-center text-center relative z-10">
+            <div class="flex items-center gap-2 mb-5">
+              <span class="text-xs font-bold uppercase tracking-widest text-on-surface-variant">Score de Financement</span>
+              <span class="flex items-center gap-1 px-2 py-0.5 bg-primary/8 text-primary rounded-full text-xs font-bold"><span class="material-symbols-outlined text-xs" style="font-variation-settings: 'FILL' 1;">smart_toy</span>IA</span>
+            </div>
+            <div class="relative w-52 h-52 mb-5">
+              <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+                <circle class="stroke-current text-surface-container-highest" cx="50" cy="50" fill="transparent" r="42" stroke-width="7"></circle>
+                <circle id="score-circle" class="score-animate" cx="50" cy="50" fill="transparent" r="42"
+                  stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" stroke-width="7" style="stroke:#006554"></circle>
               </svg>
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span id="score-value" class="text-5xl font-headline font-black text-on-surface">—</span>
-                <span class="text-sm font-bold text-on-surface-variant uppercase">Sur 100</span>
+              <div class="absolute inset-0 flex flex-col items-center justify-center gap-0.5">
+                <span id="score-value" class="text-6xl font-headline font-black leading-none" style="color:#006554">—</span>
+                <span class="text-xs font-bold text-on-surface-variant uppercase tracking-widest">/ 100</span>
               </div>
             </div>
-            <div id="score-label" class="bg-primary/10 text-primary px-4 py-2 rounded-full font-bold flex items-center gap-2 mb-4">—</div>
+            <div id="score-label" class="bg-primary/10 text-primary px-5 py-2.5 rounded-full font-bold flex items-center gap-2 text-sm">—</div>
           </div>
         </div>
-        <div class="bg-surface-container-lowest p-6 rounded-xl border border-outline-variant/20 space-y-4">
-          <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-primary-container flex items-center justify-center">
-              <span class="material-symbols-outlined text-white">smart_toy</span>
+
+        <!-- AI explanation -->
+        <div class="bg-surface-container-lowest p-6 rounded-2xl border border-outline-variant/20 space-y-4">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-primary/70 flex items-center justify-center shadow-lg shadow-primary/25">
+                <span class="material-symbols-outlined text-white text-lg" style="font-variation-settings: 'FILL' 1;">smart_toy</span>
+              </div>
+              <div>
+                <h4 class="font-bold text-on-surface">L'avis de Smart AI</h4>
+                <p class="text-xs text-on-surface-variant">Analyse personnalisée de votre dossier</p>
+              </div>
             </div>
-            <h4 class="font-bold">L'avis de Smart AI</h4>
+            <span class="text-xs text-on-surface-variant/40 font-medium">Ollama · llama3</span>
           </div>
-          <div id="ai-explanation" class="space-y-4 text-on-surface-variant leading-relaxed"></div>
+          <p id="ai-resume-executif" class="font-bold text-on-surface hidden"></p>
+          <div id="ai-points-cles" class="grid grid-cols-1 sm:grid-cols-2 gap-4 hidden">
+            <div class="p-4 bg-green-50 rounded-xl border border-green-100">
+              <p class="text-xs font-bold uppercase text-green-700 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">check_circle</span>Points forts</p>
+              <ul id="ai-points-forts" class="text-sm text-on-surface-variant space-y-1"></ul>
+            </div>
+            <div class="p-4 bg-amber-50 rounded-xl border border-amber-100">
+              <p class="text-xs font-bold uppercase text-amber-700 mb-2 flex items-center gap-2"><span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">info</span>Points d'attention</p>
+              <ul id="ai-risques" class="text-sm text-on-surface-variant space-y-1"></ul>
+            </div>
+          </div>
+          <div id="ai-explanation" class="space-y-3 text-on-surface-variant leading-relaxed text-sm"></div>
+          <div id="ai-economie" class="p-4 bg-primary/5 rounded-xl border border-primary/15 hidden">
+            <p class="text-xs font-bold uppercase text-primary mb-1">Économie potentielle</p>
+            <p id="ai-economie-text" class="text-sm font-medium text-on-surface"></p>
+          </div>
+          <div id="ai-prochaines-etapes" class="hidden">
+            <p class="text-xs font-bold uppercase text-on-surface-variant mb-2">Prochaines étapes</p>
+            <ul id="ai-etapes-list" class="space-y-2 text-sm text-on-surface-variant"></ul>
+          </div>
         </div>
+
+        <!-- Actions -->
         <div class="flex flex-col gap-3">
-          <button id="btn-email" class="w-full bg-gradient-to-br from-[#006554] to-[#0c806b] text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 active:scale-95 duration-200">
-            <span class="material-symbols-outlined">mail</span>
-            Recevoir par email
+          <button id="btn-email" class="w-full bg-gradient-to-br from-primary to-primary-container text-white py-4 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 active:scale-95 duration-200">
+            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">mail</span>
+            Recevoir les résultats par email
           </button>
+          {% if not request.user.is_authenticated %}
           <button id="btn-register" class="w-full bg-surface-container-low border-2 border-primary text-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/5 active:scale-95 duration-200">
             <span class="material-symbols-outlined">person_add</span>
-            Créer un compte pour sauvegarder
+            Sauvegarder ma simulation
           </button>
-          <a id="btn-modifier-sim" href="/simulation/etape-1/" class="w-full bg-surface-container-highest text-on-surface py-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 duration-200">
+          {% endif %}
+          <a id="btn-modifier-sim" href="/simulation/etape-1/" class="w-full bg-surface-container-highest text-on-surface py-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 duration-200 hover:bg-surface-container-high transition-colors">
             <span class="material-symbols-outlined">edit</span>
-            Modifier simulation
+            Modifier la simulation
           </a>
         </div>
       </div>
     </div>
+
+    <!-- ===== CHARTS SECTION ===== -->
+    <section class="space-y-8">
+      <h3 class="text-xl font-headline font-bold text-on-surface flex items-center gap-3">
+        <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">bar_chart</span>
+        Analyse financière détaillée
+        <span class="h-px flex-1 bg-outline-variant/20 ml-2"></span>
+      </h3>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        <!-- Amortization chart -->
+        <div class="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/15 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h4 class="font-bold text-on-surface">Tableau d'amortissement</h4>
+              <p class="text-xs text-on-surface-variant mt-0.5">Capital restant dû vs intérêts cumulés (scénario Équilibré)</p>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+              <span class="material-symbols-outlined text-blue-600 text-lg" style="font-variation-settings: 'FILL' 1;">show_chart</span>
+            </div>
+          </div>
+          <div class="h-64 mt-6">
+            <canvas id="chart-amortissement"></canvas>
+          </div>
+        </div>
+
+        <!-- Scenarios comparison bar chart -->
+        <div class="bg-surface-container-lowest rounded-2xl p-8 border border-outline-variant/15 shadow-sm">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h4 class="font-bold text-on-surface">Comparaison des scénarios</h4>
+              <p class="text-xs text-on-surface-variant mt-0.5">Coût total du crédit par scénario</p>
+            </div>
+            <div class="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
+              <span class="material-symbols-outlined text-green-600 text-lg" style="font-variation-settings: 'FILL' 1;">stacked_bar_chart</span>
+            </div>
+          </div>
+          <div class="h-64 mt-6">
+            <canvas id="chart-comparaison"></canvas>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Key metrics strip -->
+      <div id="metrics-strip" class="grid grid-cols-2 md:grid-cols-4 gap-4"></div>
+
+    </section>
+
   </div>
 </main>
+
 {% include "partials/email_modal.html" %}
 {% include "partials/register_modal.html" %}
 {% endblock %}
+
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script src="{% static 'js/simulation.js' %}"></script>
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    var el = document.getElementById('tableau-bord-content');
-    var id = el ? el.getAttribute('data-simulation-id') : null;
-    SmartCreditSimulation.initTableauBord(id ? parseInt(id, 10) : null);
+document.addEventListener('DOMContentLoaded', function() {
+  var el = document.getElementById('tableau-bord-content');
+  var id = el ? el.getAttribute('data-simulation-id') : null;
+  SmartCreditSimulation.initTableauBord(id ? parseInt(id, 10) : null);
+});
+
+// ── Chart rendering (called after API data is loaded) ──────────────────────
+window.renderSmartCreditCharts = function(sim) {
+  var resultats = sim.resultats || [];
+  var projet = sim.projet_credit || {};
+
+  // ── 1) Amortissement ─────────────────────────────────────────────────────
+  var equil = resultats.find(function(r){ return r.scenario === 'EQUILIBRE'; }) || resultats[0];
+  if (equil) {
+    var capital   = parseFloat(projet.montant_souhaite || 0) - parseFloat(projet.apport_personnel || 0);
+    var duree     = parseInt(projet.duree_mois || 240, 10);
+    var tauxMens  = parseFloat(equil.taux_utilise || (equil.offre_bancaire && equil.offre_bancaire.taux_annuel) || 3.5) / 100 / 12;
+    var mensualite = parseFloat(equil.mensualite || 0);
+
+    var labels       = [];
+    var restantDu    = [];
+    var interetsCum  = [];
+    var solde        = capital;
+    var totalInterets = 0;
+    var step         = Math.max(1, Math.floor(duree / 24)); // max 24 points
+
+    for (var t = 0; t <= duree; t++) {
+      if (t % step === 0 || t === duree) {
+        var annee = Math.floor(t / 12);
+        labels.push(annee + ' an' + (annee > 1 ? 's' : ''));
+        restantDu.push(Math.max(0, Math.round(solde)));
+        interetsCum.push(Math.round(totalInterets));
+      }
+      if (t < duree) {
+        var interetMois = solde * tauxMens;
+        var principalMois = mensualite - interetMois;
+        totalInterets += interetMois;
+        solde = Math.max(0, solde - principalMois);
+      }
+    }
+
+    var ctxAmort = document.getElementById('chart-amortissement');
+    if (ctxAmort) {
+      new Chart(ctxAmort, {
+        type: 'line',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Capital restant dû',
+              data: restantDu,
+              borderColor: '#006554',
+              backgroundColor: 'rgba(0,101,84,0.08)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              borderWidth: 2.5
+            },
+            {
+              label: 'Intérêts cumulés',
+              data: interetsCum,
+              borderColor: '#f97316',
+              backgroundColor: 'rgba(249,115,22,0.06)',
+              fill: true,
+              tension: 0.4,
+              pointRadius: 3,
+              pointHoverRadius: 6,
+              borderWidth: 2.5,
+              borderDash: [6, 3]
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'bottom', labels: { boxWidth: 12, font: { family: 'Inter', size: 11 } } },
+            tooltip: {
+              callbacks: {
+                label: function(ctx) {
+                  return ctx.dataset.label + ' : ' + ctx.parsed.y.toLocaleString('fr-FR') + ' €';
+                }
+              }
+            }
+          },
+          scales: {
+            x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } },
+            y: {
+              ticks: {
+                font: { family: 'Inter', size: 10 },
+                callback: function(v) { return (v / 1000).toFixed(0) + 'k €'; }
+              },
+              grid: { color: 'rgba(0,0,0,0.04)' }
+            }
+          }
+        }
+      });
+    }
+  }
+
+  // ── 2) Comparaison scénarios ──────────────────────────────────────────────
+  var order = ['PRUDENT', 'EQUILIBRE', 'CONFORT'];
+  var labelsComp = ['Scénario Prudent', 'Scénario Équilibré', 'Scénario Confort'];
+  var couttotaux = [];
+  var mensualites = [];
+  order.forEach(function(s) {
+    var r = resultats.find(function(x){ return x.scenario === s; });
+    couttotaux.push(r ? Math.round(parseFloat(r.cout_total)) : 0);
+    mensualites.push(r ? Math.round(parseFloat(r.mensualite)) : 0);
   });
+
+  var ctxComp = document.getElementById('chart-comparaison');
+  if (ctxComp) {
+    new Chart(ctxComp, {
+      type: 'bar',
+      data: {
+        labels: labelsComp,
+        datasets: [
+          {
+            label: 'Coût total des intérêts (€)',
+            data: couttotaux,
+            backgroundColor: ['rgba(0,101,84,0.75)', 'rgba(12,128,107,0.75)', 'rgba(249,115,22,0.65)'],
+            borderColor: ['#006554', '#0c806b', '#f97316'],
+            borderWidth: 2,
+            borderRadius: 8,
+            borderSkipped: false
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: function(ctx) {
+                return 'Intérêts : ' + ctx.parsed.y.toLocaleString('fr-FR') + ' €';
+              }
+            }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11 } } },
+          y: {
+            ticks: {
+              font: { family: 'Inter', size: 10 },
+              callback: function(v) { return (v / 1000).toFixed(0) + 'k €'; }
+            },
+            grid: { color: 'rgba(0,0,0,0.04)' }
+          }
+        }
+      }
+    });
+  }
+
+  // ── 3) Metrics strip ──────────────────────────────────────────────────────
+  if (equil) {
+    var capital = parseFloat(projet.montant_souhaite || 0) - parseFloat(projet.apport_personnel || 0);
+    var montantTotalRemb = equil.montant_total_rembourse != null ? parseFloat(equil.montant_total_rembourse) : (capital + parseFloat(equil.cout_total));
+    var metrics = [
+      { icon: 'percent', label: "Taux d'endettement", value: parseFloat(equil.taux_endettement).toFixed(1) + ' %', ok: parseFloat(equil.taux_endettement) < 35 },
+      { icon: 'savings', label: 'Reste à vivre / mois', value: Math.round(parseFloat(equil.reste_a_vivre)).toLocaleString('fr-FR') + ' €', ok: parseFloat(equil.reste_a_vivre) > 800 },
+      { icon: 'payments', label: 'Mensualité (Équilibré)', value: Math.round(parseFloat(equil.mensualite)).toLocaleString('fr-FR') + ' €', ok: true },
+      { icon: 'account_balance_wallet', label: 'Coût total intérêts (Équilibré)', value: Math.round(parseFloat(equil.cout_total)).toLocaleString('fr-FR') + ' €', ok: null },
+      { icon: 'request_quote', label: 'Total à rembourser (Équilibré)', value: Math.round(montantTotalRemb).toLocaleString('fr-FR') + ' €', ok: null }
+    ];
+    var strip = document.getElementById('metrics-strip');
+    if (strip) {
+      strip.innerHTML = metrics.map(function(m) {
+        var color = m.ok === true ? 'text-green-600 bg-green-50' : m.ok === false ? 'text-red-500 bg-red-50' : 'text-blue-600 bg-blue-50';
+        return '<div class="bg-surface-container-lowest rounded-2xl p-6 border border-outline-variant/15 space-y-3">' +
+          '<div class="w-10 h-10 rounded-xl ' + color + ' flex items-center justify-center">' +
+            '<span class="material-symbols-outlined text-lg" style="font-variation-settings: \'FILL\' 1;">' + m.icon + '</span>' +
+          '</div>' +
+          '<p class="text-2xl font-black text-on-surface">' + m.value + '</p>' +
+          '<p class="text-xs font-medium text-on-surface-variant uppercase tracking-wide">' + m.label + '</p>' +
+        '</div>';
+      }).join('');
+    }
+  }
+};
 </script>
 {% endblock %}

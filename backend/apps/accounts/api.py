@@ -5,6 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from django.contrib.auth import login, logout
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .serializers import RegisterSerializer, LoginSerializer, MeSerializer
 from apps.credit.models import Simulation
@@ -42,7 +43,11 @@ def register(request):
     if simulation_id:
         Simulation.objects.filter(id=simulation_id, utilisateur__isnull=True).update(utilisateur=user)
     login(request, user)
-    return Response(MeSerializer(user).data, status=status.HTTP_201_CREATED)
+    refresh = RefreshToken.for_user(user)
+    data = MeSerializer(user).data
+    data["access"] = str(refresh.access_token)
+    data["refresh"] = str(refresh)
+    return Response(data, status=status.HTTP_201_CREATED)
 
 
 @extend_schema(

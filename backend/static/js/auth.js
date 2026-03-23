@@ -53,10 +53,10 @@
           method: 'POST',
           headers: getCsrfHeaders(),
           body: JSON.stringify({
-            username: document.getElementById('login-email').value.trim(),
+            email: document.getElementById('login-email').value.trim(),
             password: document.getElementById('login-password').value
           }),
-          credentials: 'same-origin'
+          credentials: 'same-origin'  /* pour recevoir le cookie de session */
         })
           .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
           .then(function(r) {
@@ -95,16 +95,7 @@
           .then(function(res) { return res.json().then(function(d) { return { ok: res.ok, data: d }; }); })
           .then(function(r) {
             if (!r.ok) throw new Error(extractError(r.data));
-            return fetch(API_BASE + '/auth/token/', {
-              method: 'POST',
-              headers: getCsrfHeaders(),
-              body: JSON.stringify({ username: payload.email, password: payload.password }),
-              credentials: 'same-origin'
-            });
-          })
-          .then(function(res) { return res.json(); })
-          .then(function(tokenData) {
-            saveToken(tokenData);
+            saveToken(r.data);
             redirectAfterAuth();
           })
           .catch(function(err) {

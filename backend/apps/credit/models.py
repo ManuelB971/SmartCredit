@@ -144,6 +144,8 @@ class ExplicationIA(models.Model):
     texte_explication = models.TextField()
     recommandations = models.TextField(null=True, blank=True)
     avertissements = models.TextField(null=True, blank=True)
+    resume_executif = models.TextField(blank=True, default="")
+    donnees_enrichies = models.JSONField(default=dict, blank=True)  # points_forts_dossier, risques_identifies, prochaines_etapes
     niveau_langage = models.CharField(max_length=20, choices=NiveauLangage.choices, default=NiveauLangage.STANDARD)
     date_generation = models.DateTimeField(auto_now_add=True)
 

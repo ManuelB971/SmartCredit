@@ -1,0 +1,2234 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartCredit — Simulateur IA de crédit immobilier & étudiant</title>
+
+    <!-- Fonts: Syne (bold display) + DM Mono (tech/data) + DM Sans (body) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS CUSTOM PROPERTIES — SmartCredit Theme
+           Deep green fintech premium identity
+           =========================================== */
+        :root {
+            --green-deep:   #006554;
+            --green-mid:    #00856e;
+            --green-light:  #00c49a;
+            --green-glow:   rgba(0, 196, 154, 0.18);
+            --green-glow2:  rgba(0, 101, 84, 0.35);
+            --off-black:    #080e0c;
+            --dark:         #0d1a16;
+            --dark-card:    #111f1b;
+            --dark-border:  rgba(0, 196, 154, 0.15);
+            --cream:        #f0f5f3;
+            --text-primary: #e8f5f1;
+            --text-muted:   #7aafa0;
+            --text-dim:     #3d6b5e;
+            --gold:         #d4a84b;
+            --gold-light:   #f0cc7a;
+            --white:        #ffffff;
+
+            --font-display: 'Syne', sans-serif;
+            --font-mono:    'DM Mono', monospace;
+            --font-body:    'DM Sans', sans-serif;
+
+            --title-size:   clamp(2rem, 6vw, 5.5rem);
+            --h2-size:      clamp(1.4rem, 3.5vw, 3rem);
+            --h3-size:      clamp(1rem, 2.5vw, 1.6rem);
+            --body-size:    clamp(0.78rem, 1.4vw, 1.05rem);
+            --small-size:   clamp(0.65rem, 1vw, 0.85rem);
+            --mono-size:    clamp(0.65rem, 1.1vw, 0.9rem);
+
+            --slide-padding: clamp(1.5rem, 4vw, 5rem);
+            --content-gap:   clamp(0.6rem, 1.8vw, 2rem);
+            --element-gap:   clamp(0.3rem, 1vw, 1rem);
+
+            --ease-expo:    cubic-bezier(0.16, 1, 0.3, 1);
+            --ease-smooth:  cubic-bezier(0.4, 0, 0.2, 1);
+            --duration:     0.65s;
+        }
+
+        /* ===========================================
+           RESET
+           =========================================== */
+        *, *::before, *::after {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ===========================================
+           VIEWPORT BASE (mandatory)
+           =========================================== */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+            background: var(--off-black);
+        }
+        html {
+            scroll-snap-type: y mandatory;
+            scroll-behavior: smooth;
+        }
+        .slide {
+            width: 100vw;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
+            scroll-snap-align: start;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background: var(--dark);
+        }
+        .slide-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            max-height: 100%;
+            overflow: hidden;
+            padding: var(--slide-padding);
+        }
+
+        @media (max-height: 700px) {
+            :root {
+                --slide-padding: clamp(0.75rem, 3vw, 2rem);
+                --content-gap: clamp(0.4rem, 1.5vw, 1rem);
+                --title-size: clamp(1.25rem, 4.5vw, 2.5rem);
+                --h2-size: clamp(1rem, 3vw, 1.75rem);
+            }
+        }
+        @media (max-height: 600px) {
+            :root {
+                --slide-padding: clamp(0.5rem, 2.5vw, 1.5rem);
+                --content-gap: clamp(0.3rem, 1vw, 0.75rem);
+                --title-size: clamp(1.1rem, 4vw, 2rem);
+                --body-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            }
+            .nav-dots, .keyboard-hint, .decorative { display: none; }
+        }
+        @media (max-height: 500px) {
+            :root {
+                --slide-padding: clamp(0.4rem, 2vw, 1rem);
+                --title-size: clamp(1rem, 3.5vw, 1.5rem);
+                --h2-size: clamp(0.9rem, 2.5vw, 1.25rem);
+                --body-size: clamp(0.65rem, 1vw, 0.85rem);
+            }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.2s !important;
+            }
+            html { scroll-behavior: auto; }
+        }
+
+        /* ===========================================
+           GLOBAL ELEMENTS
+           =========================================== */
+        body {
+            font-family: var(--font-body);
+            color: var(--text-primary);
+        }
+
+        /* Progress bar */
+        .progress-bar {
+            position: fixed;
+            top: 0; left: 0;
+            height: 2px;
+            width: 0%;
+            background: linear-gradient(90deg, var(--green-deep), var(--green-light));
+            z-index: 1000;
+            transition: width 0.3s var(--ease-smooth);
+            box-shadow: 0 0 12px var(--green-glow);
+        }
+
+        /* Nav dots */
+        .nav-dots {
+            position: fixed;
+            right: clamp(0.75rem, 2vw, 1.5rem);
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: clamp(5px, 1vh, 10px);
+            z-index: 999;
+        }
+        .nav-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .nav-dot.active {
+            background: var(--green-light);
+            transform: scale(1.8);
+            box-shadow: 0 0 8px var(--green-glow);
+        }
+
+        /* Slide number */
+        .slide-num {
+            position: absolute;
+            top: clamp(1rem, 2.5vw, 2rem);
+            right: clamp(1.5rem, 3vw, 3rem);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+        }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .reveal {
+            opacity: 0;
+            transform: translateY(28px);
+            transition: opacity var(--duration) var(--ease-expo),
+                        transform var(--duration) var(--ease-expo);
+        }
+        .reveal-left {
+            opacity: 0;
+            transform: translateX(-32px);
+            transition: opacity var(--duration) var(--ease-expo),
+                        transform var(--duration) var(--ease-expo);
+        }
+        .reveal-scale {
+            opacity: 0;
+            transform: scale(0.88);
+            transition: opacity var(--duration) var(--ease-expo),
+                        transform var(--duration) var(--ease-expo);
+        }
+        .slide.visible .reveal,
+        .slide.visible .reveal-left,
+        .slide.visible .reveal-scale {
+            opacity: 1;
+            transform: none;
+        }
+        .reveal:nth-child(1), .reveal-left:nth-child(1), .reveal-scale:nth-child(1) { transition-delay: 0.05s; }
+        .reveal:nth-child(2), .reveal-left:nth-child(2), .reveal-scale:nth-child(2) { transition-delay: 0.15s; }
+        .reveal:nth-child(3), .reveal-left:nth-child(3), .reveal-scale:nth-child(3) { transition-delay: 0.25s; }
+        .reveal:nth-child(4), .reveal-left:nth-child(4), .reveal-scale:nth-child(4) { transition-delay: 0.35s; }
+        .reveal:nth-child(5), .reveal-left:nth-child(5), .reveal-scale:nth-child(5) { transition-delay: 0.42s; }
+        .reveal:nth-child(6), .reveal-left:nth-child(6), .reveal-scale:nth-child(6) { transition-delay: 0.49s; }
+
+        /* Pulse glow animation */
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px var(--green-glow2); }
+            50% { box-shadow: 0 0 40px rgba(0, 196, 154, 0.4); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        @keyframes rotate-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        @keyframes scan-line {
+            0% { top: 0; }
+            100% { top: 100%; }
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        @keyframes count-up {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===========================================
+           DECORATIVE SHAPES
+           =========================================== */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            pointer-events: none;
+        }
+        .bg-grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(0,196,154,0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,196,154,0.04) 1px, transparent 1px);
+            background-size: clamp(24px, 4vw, 48px) clamp(24px, 4vw, 48px);
+            pointer-events: none;
+        }
+        .accent-line {
+            position: absolute;
+            left: 0; top: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, transparent, var(--green-deep), transparent);
+        }
+        .corner-mark {
+            position: absolute;
+            bottom: clamp(1rem, 2vw, 2rem);
+            left: var(--slide-padding);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+        }
+
+        /* ===========================================
+           SHARED COMPONENTS
+           =========================================== */
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4em;
+            padding: 0.3em 0.9em;
+            border-radius: 100px;
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        .tag-green {
+            background: rgba(0, 196, 154, 0.12);
+            color: var(--green-light);
+            border: 1px solid rgba(0, 196, 154, 0.25);
+        }
+        .tag-gold {
+            background: rgba(212, 168, 75, 0.12);
+            color: var(--gold-light);
+            border: 1px solid rgba(212, 168, 75, 0.25);
+        }
+        .tag-dim {
+            background: rgba(255,255,255,0.04);
+            color: var(--text-muted);
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .divider {
+            width: clamp(2rem, 5vw, 4rem);
+            height: 2px;
+            background: linear-gradient(90deg, var(--green-deep), var(--green-light));
+            border-radius: 2px;
+        }
+        .card-dark {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: clamp(10px, 1.5vw, 18px);
+            padding: clamp(0.8rem, 1.8vw, 1.6rem);
+        }
+
+        /* ===========================================
+           SLIDE 1 — COVER
+           =========================================== */
+        .slide-cover {
+            background: var(--off-black);
+            justify-content: center;
+        }
+        .cover-inner {
+            display: grid;
+            grid-template-columns: 1fr;
+            max-width: 900px;
+            gap: var(--content-gap);
+        }
+        .cover-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            margin-bottom: clamp(0.4rem, 1.5vh, 1.2rem);
+        }
+        .logo-mark {
+            width: clamp(28px, 4vw, 44px);
+            height: clamp(28px, 4vw, 44px);
+            background: linear-gradient(135deg, var(--green-deep), var(--green-light));
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(14px, 2vw, 22px);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        .logo-text {
+            font-family: var(--font-display);
+            font-size: clamp(1rem, 2vw, 1.5rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.02em;
+        }
+        .cover-title {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.0;
+            letter-spacing: -0.02em;
+        }
+        .cover-title .accent-word {
+            display: block;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .cover-tagline {
+            font-size: clamp(0.85rem, 1.8vw, 1.2rem);
+            color: var(--text-muted);
+            font-weight: 300;
+            max-width: 600px;
+            line-height: 1.6;
+        }
+        .cover-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6em;
+            margin-top: clamp(0.2rem, 1vh, 0.8rem);
+        }
+        .cover-bg-orb-1 {
+            width: clamp(200px, 40vw, 600px);
+            height: clamp(200px, 40vw, 600px);
+            background: radial-gradient(circle, rgba(0,101,84,0.5), transparent 70%);
+            top: -20%;
+            right: -15%;
+        }
+        .cover-bg-orb-2 {
+            width: clamp(100px, 20vw, 300px);
+            height: clamp(100px, 20vw, 300px);
+            background: radial-gradient(circle, rgba(0,196,154,0.15), transparent 70%);
+            bottom: 10%;
+            left: -5%;
+        }
+        .cover-year {
+            position: absolute;
+            bottom: clamp(1rem, 2vh, 2rem);
+            right: var(--slide-padding);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+
+        /* ===========================================
+           SLIDE 2 — PROBLÈME
+           =========================================== */
+        .slide-problem {
+            background: var(--dark);
+        }
+        .problem-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1.5rem, 4vw, 4rem);
+            align-items: center;
+            max-height: min(80vh, 700px);
+        }
+        .problem-left h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+        .problem-left h2 em {
+            font-style: normal;
+            color: var(--green-light);
+        }
+        .problem-left p {
+            font-size: var(--body-size);
+            color: var(--text-muted);
+            line-height: 1.65;
+        }
+        .pain-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.5rem, 1.2vh, 1rem);
+        }
+        .pain-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1em;
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+        }
+        .pain-icon {
+            font-size: clamp(1rem, 2vw, 1.4rem);
+            flex-shrink: 0;
+        }
+        .pain-text strong {
+            display: block;
+            font-size: var(--body-size);
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.15em;
+        }
+        .pain-text span {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           SLIDE 3 — SOLUTION
+           =========================================== */
+        .slide-solution {
+            background: var(--dark);
+        }
+        .solution-header {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.3rem, 0.8vh, 0.8rem);
+            margin-bottom: var(--content-gap);
+        }
+        .solution-header h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .solution-header h2 .hl { color: var(--green-light); }
+        .solution-header p {
+            font-size: var(--body-size);
+            color: var(--text-muted);
+        }
+        .kpi-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.6rem, 1.5vw, 1.2rem);
+            margin-bottom: var(--content-gap);
+        }
+        .kpi-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: clamp(10px, 1.5vw, 14px);
+            padding: clamp(0.7rem, 1.5vw, 1.2rem);
+            text-align: center;
+        }
+        .kpi-value {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            color: var(--green-light);
+            line-height: 1;
+            display: block;
+        }
+        .kpi-label {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            margin-top: 0.3em;
+            display: block;
+        }
+        .features-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(0.5rem, 1vw, 1rem);
+        }
+        .feat-item {
+            display: flex;
+            align-items: center;
+            gap: 0.7em;
+            font-size: var(--body-size);
+            color: var(--text-muted);
+        }
+        .feat-item .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green-light);
+            flex-shrink: 0;
+        }
+
+        /* ===========================================
+           SLIDE 4 — WIZARD ÉTAPES
+           =========================================== */
+        .slide-wizard {
+            background: var(--dark);
+        }
+        .wizard-layout {
+            display: grid;
+            grid-template-columns: auto 1fr;
+            gap: clamp(1.5rem, 4vw, 4rem);
+            align-items: start;
+            max-height: min(80vh, 700px);
+        }
+        .wizard-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+            position: relative;
+        }
+        .wizard-step {
+            display: flex;
+            align-items: flex-start;
+            gap: clamp(0.8rem, 1.5vw, 1.4rem);
+            position: relative;
+        }
+        .step-connector {
+            position: absolute;
+            left: calc(clamp(14px, 2.5vw, 22px));
+            top: clamp(28px, 5vw, 44px);
+            width: 2px;
+            height: clamp(2rem, 5vh, 4rem);
+            background: linear-gradient(180deg, var(--green-deep), transparent);
+        }
+        .step-num {
+            width: clamp(28px, 5vw, 44px);
+            height: clamp(28px, 5vw, 44px);
+            border-radius: 50%;
+            background: var(--green-deep);
+            color: var(--white);
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            font-weight: 500;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            border: 2px solid var(--green-mid);
+            margin-bottom: clamp(2rem, 4vh, 3.5rem);
+        }
+        .step-body h3 {
+            font-family: var(--font-display);
+            font-size: var(--h3-size);
+            font-weight: 700;
+            margin-bottom: 0.3em;
+        }
+        .step-body p {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .step-fields {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4em;
+            margin-top: 0.4em;
+        }
+        .field-pill {
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.8vw, 0.72rem);
+            padding: 0.2em 0.6em;
+            border-radius: 4px;
+            background: rgba(0,196,154,0.08);
+            color: var(--text-muted);
+            border: 1px solid rgba(0,196,154,0.12);
+        }
+        .wizard-right h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+        .wizard-right h2 .hl { color: var(--green-light); }
+        .flow-arrow {
+            display: flex;
+            align-items: center;
+            gap: 0.6em;
+            margin: clamp(0.4rem, 1vh, 0.8rem) 0;
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+        .flow-arrow::before {
+            content: '';
+            height: 1px;
+            width: clamp(20px, 3vw, 40px);
+            background: var(--green-deep);
+            flex-shrink: 0;
+        }
+        .result-box {
+            margin-top: clamp(0.5rem, 1.5vh, 1rem);
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            background: linear-gradient(135deg, rgba(0,101,84,0.2), rgba(0,196,154,0.08));
+            border: 1px solid rgba(0,196,154,0.25);
+            border-radius: 12px;
+        }
+        .result-box h4 {
+            font-family: var(--font-display);
+            font-size: clamp(0.8rem, 1.5vw, 1rem);
+            font-weight: 700;
+            color: var(--green-light);
+            margin-bottom: 0.4em;
+        }
+        .result-box p {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+        }
+
+        /* ===========================================
+           SLIDE 5 — ARCHITECTURE
+           =========================================== */
+        .slide-arch {
+            background: var(--dark);
+        }
+        .arch-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: clamp(1.5rem, 4vw, 3rem);
+            align-items: center;
+            max-height: min(80vh, 700px);
+        }
+        .arch-left h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+        .arch-left h2 .hl { color: var(--green-light); }
+        .stack-layers {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vh, 0.7rem);
+        }
+        .stack-layer {
+            display: flex;
+            align-items: center;
+            gap: 0.8em;
+            padding: clamp(0.5rem, 1vw, 0.9rem) clamp(0.7rem, 1.2vw, 1.2rem);
+            border-radius: 8px;
+            font-size: var(--small-size);
+        }
+        .layer-icon { font-size: clamp(0.9rem, 1.5vw, 1.2rem); flex-shrink: 0; }
+        .layer-name {
+            font-family: var(--font-mono);
+            color: var(--text-primary);
+            font-weight: 500;
+            min-width: 5em;
+        }
+        .layer-tech {
+            color: var(--text-muted);
+            font-size: var(--small-size);
+        }
+        .layer-fe { background: rgba(0,196,154,0.06); border: 1px solid rgba(0,196,154,0.12); }
+        .layer-api { background: rgba(0,133,110,0.08); border: 1px solid rgba(0,133,110,0.15); }
+        .layer-be { background: rgba(0,101,84,0.1); border: 1px solid rgba(0,101,84,0.2); }
+        .layer-ai { background: rgba(212,168,75,0.06); border: 1px solid rgba(212,168,75,0.15); }
+        .layer-db { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+        .layer-infra { background: rgba(0,196,154,0.04); border: 1px solid rgba(0,196,154,0.08); }
+
+        .arch-diagram {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.3rem, 0.7vh, 0.6rem);
+        }
+        .arch-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.3rem, 0.7vw, 0.6rem);
+        }
+        .arch-box {
+            padding: clamp(0.4rem, 0.8vw, 0.8rem);
+            border-radius: 8px;
+            text-align: center;
+        }
+        .arch-box-label {
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.8vw, 0.72rem);
+            font-weight: 500;
+        }
+        .arch-box-sub {
+            font-size: clamp(0.5rem, 0.7vw, 0.62rem);
+            color: var(--text-dim);
+            margin-top: 0.15em;
+        }
+        .ab-green { background: rgba(0,196,154,0.1); border: 1px solid rgba(0,196,154,0.2); }
+        .ab-green .arch-box-label { color: var(--green-light); }
+        .ab-mid { background: rgba(0,133,110,0.08); border: 1px solid rgba(0,133,110,0.15); }
+        .ab-mid .arch-box-label { color: var(--green-mid); }
+        .ab-gold { background: rgba(212,168,75,0.08); border: 1px solid rgba(212,168,75,0.15); }
+        .ab-gold .arch-box-label { color: var(--gold-light); }
+        .ab-dim { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); }
+        .ab-dim .arch-box-label { color: var(--text-muted); }
+        .arch-arrow-row {
+            display: flex;
+            justify-content: center;
+            color: var(--text-dim);
+            font-size: var(--small-size);
+        }
+
+        /* ===========================================
+           SLIDE 6 — SCORE IA
+           =========================================== */
+        .slide-ai {
+            background: var(--dark);
+        }
+        .ai-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: clamp(1.5rem, 4vw, 4rem);
+            align-items: center;
+            max-height: min(80vh, 700px);
+        }
+        .ai-left h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+        .ai-left h2 .hl { color: var(--green-light); }
+        .score-visual {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: clamp(0.5rem, 1.5vh, 1rem);
+        }
+        .score-ring-wrap {
+            position: relative;
+            width: clamp(100px, 18vw, 180px);
+            height: clamp(100px, 18vw, 180px);
+        }
+        .score-ring {
+            width: 100%;
+            height: 100%;
+            transform: rotate(-90deg);
+        }
+        .score-ring-bg { fill: none; stroke: var(--dark-card); stroke-width: 8; }
+        .score-ring-fill {
+            fill: none;
+            stroke: url(#scoreGrad);
+            stroke-width: 8;
+            stroke-linecap: round;
+            stroke-dasharray: 283;
+            stroke-dashoffset: 283;
+            transition: stroke-dashoffset 1.5s var(--ease-expo);
+        }
+        .slide.visible .score-ring-fill { stroke-dashoffset: 75; }
+        .score-center {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .score-number {
+            font-family: var(--font-display);
+            font-size: clamp(1.5rem, 3.5vw, 2.8rem);
+            font-weight: 800;
+            color: var(--green-light);
+            line-height: 1;
+        }
+        .score-label {
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+        .score-rules {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vh, 0.7rem);
+        }
+        .rule-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.8em;
+            padding: clamp(0.5rem, 1vw, 0.9rem);
+            border-radius: 8px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .rule-badge {
+            font-family: var(--font-mono);
+            font-size: clamp(0.6rem, 0.9vw, 0.76rem);
+            font-weight: 700;
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            flex-shrink: 0;
+            margin-top: 0.1em;
+        }
+        .rb-red { background: rgba(255,80,80,0.12); color: #ff8080; border: 1px solid rgba(255,80,80,0.2); }
+        .rb-amber { background: rgba(255,190,50,0.12); color: #ffd080; border: 1px solid rgba(255,190,50,0.2); }
+        .rule-desc { font-size: var(--small-size); color: var(--text-muted); line-height: 1.5; }
+        .rule-desc strong { color: var(--text-primary); font-weight: 500; display: block; margin-bottom: 0.1em; }
+        .fallback-note {
+            padding: clamp(0.5rem, 1vw, 0.9rem);
+            border-radius: 8px;
+            background: rgba(212,168,75,0.06);
+            border: 1px solid rgba(212,168,75,0.15);
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+        .fallback-note strong { color: var(--gold-light); }
+
+        /* ===========================================
+           SLIDE 7 — TABLEAU DE BORD
+           =========================================== */
+        .slide-dashboard {
+            background: var(--dark);
+        }
+        .dash-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.4fr;
+            gap: clamp(1.5rem, 4vw, 3rem);
+            align-items: start;
+            max-height: min(80vh, 700px);
+        }
+        .dash-left h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+        .dash-left h2 .hl { color: var(--green-light); }
+        .scenario-cards {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vh, 0.7rem);
+        }
+        .scenario-card {
+            padding: clamp(0.55rem, 1vw, 0.9rem) clamp(0.7rem, 1.2vw, 1.1rem);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8em;
+        }
+        .sc-prudent { background: rgba(0,101,84,0.18); border: 1px solid rgba(0,101,84,0.3); }
+        .sc-equilibre { background: rgba(0,196,154,0.12); border: 2px solid rgba(0,196,154,0.4); position: relative; overflow: hidden; }
+        .sc-equilibre::after { content: 'IA RECOMMANDE'; position: absolute; top: 4px; right: 8px; font-family: var(--font-mono); font-size: 0.55rem; color: var(--green-light); letter-spacing: 0.08em; }
+        .sc-confort { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.07); }
+        .sc-name {
+            font-family: var(--font-mono);
+            font-size: var(--small-size);
+            font-weight: 500;
+            letter-spacing: 0.1em;
+        }
+        .sc-prudent .sc-name { color: var(--green-mid); }
+        .sc-equilibre .sc-name { color: var(--green-light); }
+        .sc-confort .sc-name { color: var(--text-muted); }
+        .sc-data {
+            text-align: right;
+        }
+        .sc-rate {
+            font-family: var(--font-display);
+            font-size: clamp(0.9rem, 1.8vw, 1.3rem);
+            font-weight: 700;
+        }
+        .sc-prudent .sc-rate { color: var(--green-mid); }
+        .sc-equilibre .sc-rate { color: var(--green-light); }
+        .sc-confort .sc-rate { color: var(--text-muted); }
+        .sc-monthly {
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+        .dash-right {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vh, 0.7rem);
+        }
+        .dash-widget {
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+        }
+        .dash-widget-title {
+            font-family: var(--font-mono);
+            font-size: clamp(0.58rem, 0.85vw, 0.74rem);
+            color: var(--text-dim);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            margin-bottom: 0.6em;
+        }
+        .mini-chart {
+            height: clamp(36px, 6vh, 60px);
+            display: flex;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        .mini-bar {
+            flex: 1;
+            border-radius: 3px 3px 0 0;
+            background: linear-gradient(180deg, var(--green-light), var(--green-deep));
+            opacity: 0.6;
+            transition: opacity 0.3s, height 0.5s var(--ease-expo);
+        }
+        .mini-bar:hover { opacity: 1; }
+        .bank-compare {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.4em;
+        }
+        .bank-item {
+            text-align: center;
+        }
+        .bank-name {
+            font-size: clamp(0.5rem, 0.75vw, 0.65rem);
+            color: var(--text-dim);
+            margin-bottom: 0.2em;
+        }
+        .bank-rate-val {
+            font-family: var(--font-mono);
+            font-size: clamp(0.62rem, 1vw, 0.82rem);
+            font-weight: 500;
+            color: var(--green-light);
+        }
+        .export-row {
+            display: flex;
+            gap: 0.5em;
+        }
+        .export-btn {
+            flex: 1;
+            padding: clamp(0.35rem, 0.7vw, 0.6rem);
+            border-radius: 7px;
+            border: 1px solid var(--dark-border);
+            background: transparent;
+            color: var(--text-muted);
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.8vw, 0.7rem);
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+        }
+        .export-btn:hover { background: rgba(0,196,154,0.08); color: var(--green-light); }
+
+        /* ===========================================
+           SLIDE 8 — API
+           =========================================== */
+        .slide-api {
+            background: var(--dark);
+        }
+        .api-layout {
+            display: grid;
+            grid-template-columns: 1fr 1.3fr;
+            gap: clamp(1.5rem, 4vw, 3.5rem);
+            align-items: start;
+            max-height: min(80vh, 700px);
+        }
+        .api-left h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+            margin-bottom: var(--content-gap);
+        }
+        .api-left h2 .hl { color: var(--green-light); }
+        .endpoint-list {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.7vh, 0.6rem);
+        }
+        .endpoint {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.7em;
+            padding: clamp(0.5rem, 0.9vw, 0.8rem);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: var(--mono-size);
+        }
+        .method {
+            padding: 0.1em 0.45em;
+            border-radius: 4px;
+            font-size: clamp(0.55rem, 0.75vw, 0.65rem);
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+        .m-post { background: rgba(0,196,154,0.15); color: var(--green-light); }
+        .m-get  { background: rgba(100,180,255,0.12); color: #80c8ff; }
+        .ep-path { color: var(--text-primary); font-size: var(--mono-size); }
+        .ep-desc { color: var(--text-dim); font-size: clamp(0.55rem, 0.8vw, 0.68rem); display: block; margin-top: 0.15em; }
+        .api-right {
+            display: flex;
+            flex-direction: column;
+            gap: clamp(0.4rem, 0.8vh, 0.7rem);
+        }
+        .code-block {
+            background: #0a1612;
+            border: 1px solid rgba(0,196,154,0.15);
+            border-radius: 10px;
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            font-family: var(--font-mono);
+            font-size: clamp(0.58rem, 0.85vw, 0.74rem);
+            line-height: 1.65;
+            overflow: hidden;
+        }
+        .code-block .kw { color: var(--green-light); }
+        .code-block .str { color: #f5d87f; }
+        .code-block .cmt { color: var(--text-dim); font-style: italic; }
+        .code-block .num { color: #80c8ff; }
+        .api-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5em;
+        }
+
+        /* ===========================================
+           SLIDE 9 — BANQUES
+           =========================================== */
+        .slide-banks {
+            background: var(--dark);
+        }
+        .banks-header {
+            margin-bottom: var(--content-gap);
+        }
+        .banks-header h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .banks-header h2 .hl { color: var(--green-light); }
+        .banks-header p {
+            font-size: var(--body-size);
+            color: var(--text-muted);
+            margin-top: 0.4em;
+        }
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: clamp(0.5rem, 1vw, 0.9rem);
+            margin-bottom: var(--content-gap);
+        }
+        .bank-card {
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+        }
+        .bank-card-name {
+            font-family: var(--font-display);
+            font-size: clamp(0.7rem, 1.2vw, 0.95rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.4em;
+        }
+        .bank-rates {
+            display: flex;
+            gap: 0.4em;
+            flex-wrap: wrap;
+        }
+        .rate-chip {
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.75vw, 0.65rem);
+            padding: 0.15em 0.5em;
+            border-radius: 4px;
+            background: rgba(0,196,154,0.07);
+            color: var(--green-light);
+            border: 1px solid rgba(0,196,154,0.12);
+        }
+        .rates-legend {
+            display: flex;
+            gap: clamp(0.5rem, 2vw, 1.5rem);
+            flex-wrap: wrap;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4em;
+            font-size: var(--small-size);
+            color: var(--text-muted);
+        }
+        .legend-dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--green-light);
+        }
+
+        /* ===========================================
+           SLIDE 10 — ROADMAP
+           =========================================== */
+        .slide-roadmap {
+            background: var(--dark);
+        }
+        .roadmap-header {
+            margin-bottom: var(--content-gap);
+        }
+        .roadmap-header h2 {
+            font-family: var(--font-display);
+            font-size: var(--h2-size);
+            font-weight: 800;
+            line-height: 1.1;
+        }
+        .roadmap-header h2 .hl { color: var(--green-light); }
+        .timeline {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: clamp(0.6rem, 1.2vw, 1rem);
+        }
+        .timeline-item {
+            padding: clamp(0.6rem, 1.2vw, 1rem);
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            display: flex;
+            gap: 0.8em;
+        }
+        .timeline-phase {
+            flex-shrink: 0;
+        }
+        .phase-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.2em 0.6em;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: clamp(0.55rem, 0.75vw, 0.65rem);
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+        .pb-now { background: rgba(0,196,154,0.15); color: var(--green-light); border: 1px solid rgba(0,196,154,0.25); }
+        .pb-q2  { background: rgba(212,168,75,0.12); color: var(--gold-light); border: 1px solid rgba(212,168,75,0.2); }
+        .pb-q3  { background: rgba(100,150,255,0.1); color: #80b0ff; border: 1px solid rgba(100,150,255,0.2); }
+        .pb-q4  { background: rgba(255,255,255,0.05); color: var(--text-muted); border: 1px solid rgba(255,255,255,0.1); }
+        .timeline-body h4 {
+            font-family: var(--font-display);
+            font-size: clamp(0.8rem, 1.3vw, 1rem);
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.3em;
+            margin-top: 0.1em;
+        }
+        .timeline-body p {
+            font-size: var(--small-size);
+            color: var(--text-muted);
+            line-height: 1.5;
+        }
+
+        /* ===========================================
+           SLIDE 11 — CONCLUSION
+           =========================================== */
+        .slide-conclusion {
+            background: var(--off-black);
+        }
+        .conclusion-inner {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: var(--content-gap);
+            max-width: 800px;
+        }
+        .conclusion-title {
+            font-family: var(--font-display);
+            font-size: var(--title-size);
+            font-weight: 800;
+            line-height: 1.0;
+            letter-spacing: -0.02em;
+        }
+        .conclusion-title .hl {
+            display: block;
+            background: linear-gradient(135deg, var(--green-mid), var(--green-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .conclusion-subtitle {
+            font-size: var(--body-size);
+            color: var(--text-muted);
+            line-height: 1.65;
+            max-width: 520px;
+        }
+        .conclusion-cta {
+            display: flex;
+            gap: clamp(0.5rem, 1.5vw, 1rem);
+            flex-wrap: wrap;
+        }
+        .btn-primary {
+            padding: clamp(0.5rem, 1vw, 0.8rem) clamp(1rem, 2vw, 1.6rem);
+            background: linear-gradient(135deg, var(--green-deep), var(--green-mid));
+            color: var(--white);
+            border: none;
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-size: var(--body-size);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.25s;
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        .btn-primary:hover { transform: translateY(-2px); filter: brightness(1.1); }
+        .btn-outline {
+            padding: clamp(0.5rem, 1vw, 0.8rem) clamp(1rem, 2vw, 1.6rem);
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--dark-border);
+            border-radius: 8px;
+            font-family: var(--font-display);
+            font-size: var(--body-size);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s;
+        }
+        .btn-outline:hover { border-color: var(--green-light); color: var(--green-light); }
+        .conclusion-stats {
+            display: flex;
+            gap: clamp(1rem, 3vw, 2.5rem);
+            flex-wrap: wrap;
+            padding-top: clamp(0.3rem, 1vh, 0.8rem);
+            border-top: 1px solid rgba(255,255,255,0.06);
+            width: 100%;
+        }
+        .c-stat .c-val {
+            font-family: var(--font-display);
+            font-size: clamp(1.2rem, 2.5vw, 2rem);
+            font-weight: 800;
+            color: var(--green-light);
+        }
+        .c-stat .c-lbl {
+            font-size: var(--small-size);
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+
+<!-- Progress bar -->
+<div class="progress-bar" id="progressBar"></div>
+
+<!-- Navigation dots -->
+<nav class="nav-dots" id="navDots" aria-label="Navigation des slides"></nav>
+
+<!-- ================================================
+     SLIDE 1 — COVER
+     ================================================ -->
+<section class="slide slide-cover" id="slide-1">
+    <div class="bg-orb bg-orb cover-bg-orb-1"></div>
+    <div class="bg-orb bg-orb cover-bg-orb-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="slide-content" style="justify-content:center;">
+        <div class="cover-inner">
+            <div class="cover-logo reveal">
+                <div class="logo-mark">🏦</div>
+                <span class="logo-text">SmartCredit</span>
+            </div>
+
+            <h1 class="cover-title reveal">
+                Comparez,
+                <span class="accent-word">Simulez,</span>
+                Décidez.
+            </h1>
+
+            <p class="cover-tagline reveal">
+                Simulateur de crédit immobilier &amp; étudiant propulsé par l'IA —
+                9 banques, 3 scénarios, score personnalisé. En moins de 3 minutes.
+            </p>
+
+            <div class="cover-meta reveal">
+                <span class="tag tag-green">✦ Django 5 + DRF</span>
+                <span class="tag tag-gold">⚡ Ollama llama3.1:8b</span>
+                <span class="tag tag-dim">🐳 Docker</span>
+                <span class="tag tag-dim">🔑 JWT Auth</span>
+            </div>
+        </div>
+    </div>
+
+    <span class="cover-year">Mars 2026 — v1.0</span>
+    <span class="slide-num">01 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 2 — PROBLÈME
+     ================================================ -->
+<section class="slide slide-problem" id="slide-2">
+    <div class="bg-grid"></div>
+    <div class="accent-line"></div>
+
+    <div class="slide-content">
+        <div class="problem-layout">
+            <div class="problem-left">
+                <span class="tag tag-dim reveal" style="margin-bottom:0.8em;">Le problème</span>
+                <h2 class="reveal">
+                    Comparer les crédits,<br>
+                    c'est <em>kafkaïen</em>.
+                </h2>
+                <div class="divider reveal" style="margin-bottom:0.8em;"></div>
+                <p class="reveal">
+                    Obtenir un crédit en France implique des dizaines de rendez-vous,
+                    des taux opaques, et des simulateurs bancaires qui ne donnent pas de réponse claire.
+                </p>
+            </div>
+
+            <ul class="pain-list">
+                <li class="pain-item reveal">
+                    <span class="pain-icon">⏱</span>
+                    <div class="pain-text">
+                        <strong>Processus chronophage</strong>
+                        <span>Contacter 9 banques = 9 RDV. Des semaines perdues avant d'avoir une vision claire.</span>
+                    </div>
+                </li>
+                <li class="pain-item reveal">
+                    <span class="pain-icon">🌫</span>
+                    <div class="pain-text">
+                        <strong>Taux opaques &amp; incomparables</strong>
+                        <span>Chaque banque a ses propres conditions, frais, et barèmes cachés.</span>
+                    </div>
+                </li>
+                <li class="pain-item reveal">
+                    <span class="pain-icon">📊</span>
+                    <div class="pain-text">
+                        <strong>Pas de vision globale</strong>
+                        <span>Aucun outil gratuit ne permet de voir son taux d'endettement, reste à vivre, et scénarios en un coup d'œil.</span>
+                    </div>
+                </li>
+                <li class="pain-item reveal">
+                    <span class="pain-icon">🔐</span>
+                    <div class="pain-text">
+                        <strong>Inscription obligatoire partout</strong>
+                        <span>Les simulateurs existants capturent vos données avant de montrer le moindre résultat.</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">02 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 3 — SOLUTION
+     ================================================ -->
+<section class="slide slide-solution" id="slide-3">
+    <div class="bg-grid"></div>
+
+    <div class="slide-content">
+        <div class="solution-header">
+            <span class="tag tag-green reveal">La solution</span>
+            <h2 class="reveal">
+                SmartCredit — <span class="hl">9 banques,<br>1 simulation, 3 min.</span>
+            </h2>
+            <p class="reveal">Sans inscription. Sans friction. Avec l'IA.</p>
+        </div>
+
+        <div class="kpi-row">
+            <div class="kpi-card reveal-scale">
+                <span class="kpi-value">9</span>
+                <span class="kpi-label">banques françaises</span>
+            </div>
+            <div class="kpi-card reveal-scale">
+                <span class="kpi-value">&lt;3'</span>
+                <span class="kpi-label">résultats complets</span>
+            </div>
+            <div class="kpi-card reveal-scale">
+                <span class="kpi-value">0</span>
+                <span class="kpi-label">compte requis</span>
+            </div>
+        </div>
+
+        <div class="features-row">
+            <div class="feat-item reveal"><span class="dot"></span>Score IA 0–100 personnalisé</div>
+            <div class="feat-item reveal"><span class="dot"></span>3 scénarios PRUDENT · ÉQUILIBRÉ · CONFORT</div>
+            <div class="feat-item reveal"><span class="dot"></span>Tableau de bord Chart.js interactif</div>
+            <div class="feat-item reveal"><span class="dot"></span>IA locale Ollama, 0 dépendance cloud</div>
+            <div class="feat-item reveal"><span class="dot"></span>Taux réels barème mars 2026</div>
+            <div class="feat-item reveal"><span class="dot"></span>Export email traçable</div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">03 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 4 — WIZARD 3 ÉTAPES
+     ================================================ -->
+<section class="slide slide-wizard" id="slide-4">
+    <div class="bg-grid"></div>
+    <div class="accent-line"></div>
+
+    <div class="slide-content">
+        <div class="wizard-layout">
+            <div>
+                <div class="wizard-steps">
+                    <div class="wizard-step">
+                        <div>
+                            <div class="step-num">01</div>
+                            <div class="step-connector"></div>
+                        </div>
+                        <div class="step-body reveal">
+                            <h3>Profil</h3>
+                            <p>Votre situation personnelle</p>
+                            <div class="step-fields">
+                                <span class="field-pill">âge</span>
+                                <span class="field-pill">situation familiale</span>
+                                <span class="field-pill">ville</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-step">
+                        <div>
+                            <div class="step-num">02</div>
+                            <div class="step-connector"></div>
+                        </div>
+                        <div class="step-body reveal">
+                            <h3>Revenus</h3>
+                            <p>Votre situation financière</p>
+                            <div class="step-fields">
+                                <span class="field-pill">salaire</span>
+                                <span class="field-pill">charges</span>
+                                <span class="field-pill">ancienneté</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="wizard-step">
+                        <div>
+                            <div class="step-num">03</div>
+                        </div>
+                        <div class="step-body reveal">
+                            <h3>Projet</h3>
+                            <p>Les paramètres du crédit</p>
+                            <div class="step-fields">
+                                <span class="field-pill">montant</span>
+                                <span class="field-pill">durée</span>
+                                <span class="field-pill">apport</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="wizard-right">
+                <span class="tag tag-green reveal" style="margin-bottom:0.8em;">Demo flow</span>
+                <h2 class="reveal">Le wizard en <span class="hl">3 étapes guidées</span></h2>
+
+                <div class="flow-arrow reveal">POST /api/simulations/</div>
+                <div class="flow-arrow reveal">POST /api/simulations/{id}/calcul/</div>
+                <div class="flow-arrow reveal">Score Ollama llama3.1:8b</div>
+
+                <div class="result-box reveal">
+                    <h4>🎯 Résultats instantanés</h4>
+                    <p>Score IA · Explication personnalisée · 3 scénarios comparés ·
+                    Tableau d'amortissement · Comparaison des 9 banques</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">04 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 5 — ARCHITECTURE
+     ================================================ -->
+<section class="slide slide-arch" id="slide-5">
+    <div class="bg-grid"></div>
+
+    <div class="slide-content">
+        <div class="arch-layout">
+            <div class="arch-left">
+                <span class="tag tag-green reveal" style="margin-bottom:0.8em;">Stack technique</span>
+                <h2 class="reveal">Architecture <span class="hl">propre &amp; modulaire</span></h2>
+
+                <div class="stack-layers">
+                    <div class="stack-layer layer-fe reveal">
+                        <span class="layer-icon">🎨</span>
+                        <span class="layer-name">Frontend</span>
+                        <span class="layer-tech">Tailwind CSS · Material Design 3 · Chart.js 4 · Vanilla JS</span>
+                    </div>
+                    <div class="stack-layer layer-api reveal">
+                        <span class="layer-icon">🔌</span>
+                        <span class="layer-name">API</span>
+                        <span class="layer-tech">Django REST Framework 3.15 · drf-spectacular · JWT</span>
+                    </div>
+                    <div class="stack-layer layer-be reveal">
+                        <span class="layer-icon">⚙️</span>
+                        <span class="layer-name">Backend</span>
+                        <span class="layer-tech">Django 5.0 · apps: accounts · credit · ai · exports</span>
+                    </div>
+                    <div class="stack-layer layer-ai reveal">
+                        <span class="layer-icon">🤖</span>
+                        <span class="layer-name">IA</span>
+                        <span class="layer-tech">Ollama llama3.1:8b + fallback rule-based automatique</span>
+                    </div>
+                    <div class="stack-layer layer-db reveal">
+                        <span class="layer-icon">🗄</span>
+                        <span class="layer-name">Data</span>
+                        <span class="layer-tech">PostgreSQL 16 · SimpleJWT · Session hybride</span>
+                    </div>
+                    <div class="stack-layer layer-infra reveal">
+                        <span class="layer-icon">🐳</span>
+                        <span class="layer-name">Infra</span>
+                        <span class="layer-tech">Docker · Docker Compose — déploiement en 2 commandes</span>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div class="arch-diagram">
+                    <div class="arch-row">
+                        <div class="arch-box ab-green reveal-scale">
+                            <div class="arch-box-label">Browser</div>
+                            <div class="arch-box-sub">Tailwind + Chart.js</div>
+                        </div>
+                        <div class="arch-box ab-green reveal-scale">
+                            <div class="arch-box-label">Wizard UI</div>
+                            <div class="arch-box-sub">3 étapes guidées</div>
+                        </div>
+                        <div class="arch-box ab-green reveal-scale">
+                            <div class="arch-box-label">Dashboard</div>
+                            <div class="arch-box-sub">Score + graphiques</div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow-row reveal">↓ REST JSON ↓</div>
+                    <div class="arch-row">
+                        <div class="arch-box ab-mid reveal-scale">
+                            <div class="arch-box-label">accounts</div>
+                            <div class="arch-box-sub">JWT + sessions</div>
+                        </div>
+                        <div class="arch-box ab-mid reveal-scale">
+                            <div class="arch-box-label">credit</div>
+                            <div class="arch-box-sub">Simul. + offres</div>
+                        </div>
+                        <div class="arch-box ab-mid reveal-scale">
+                            <div class="arch-box-label">exports</div>
+                            <div class="arch-box-sub">Email traçable</div>
+                        </div>
+                    </div>
+                    <div class="arch-arrow-row reveal">↓ Ollama API ↓</div>
+                    <div class="arch-row">
+                        <div class="arch-box ab-gold reveal-scale">
+                            <div class="arch-box-label">ai app</div>
+                            <div class="arch-box-sub">llama3.1:8b</div>
+                        </div>
+                        <div class="arch-box ab-dim reveal-scale">
+                            <div class="arch-box-label">PostgreSQL</div>
+                            <div class="arch-box-sub">v16</div>
+                        </div>
+                        <div class="arch-box ab-dim reveal-scale">
+                            <div class="arch-box-label">Docker</div>
+                            <div class="arch-box-sub">Compose</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">05 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 6 — SCORE IA
+     ================================================ -->
+<section class="slide slide-ai" id="slide-6">
+    <div class="bg-grid"></div>
+    <div class="accent-line"></div>
+
+    <div class="slide-content">
+        <div class="ai-layout">
+            <div class="ai-left">
+                <span class="tag tag-gold reveal" style="margin-bottom:0.8em;">Intelligence Artificielle</span>
+                <h2 class="reveal">Score IA <span class="hl">0 → 100</span><br>&amp; fallback transparent</h2>
+                <div class="divider reveal" style="margin-bottom: 0.8em;"></div>
+
+                <div class="rule-item reveal">
+                    <span class="rule-badge rb-red">−65 pts</span>
+                    <div class="rule-desc">
+                        <strong>Taux d'endettement &gt; 35 %</strong>
+                        Seuil légal de vigilance — risque de refus bancaire.
+                    </div>
+                </div>
+                <div class="rule-item reveal">
+                    <span class="rule-badge rb-amber">−55 pts</span>
+                    <div class="rule-desc">
+                        <strong>Reste à vivre &lt; 800 €/mois</strong>
+                        Indicateur de tension budgétaire post-remboursement.
+                    </div>
+                </div>
+
+                <div class="fallback-note reveal">
+                    <strong>⚡ Fallback rule-based automatique</strong> — Si Ollama est indisponible,
+                    le moteur de règles prend le relais en silence. Zéro dépendance cloud,
+                    zéro interruption de service.
+                </div>
+            </div>
+
+            <div class="score-visual">
+                <div class="score-ring-wrap reveal-scale">
+                    <svg class="score-ring" viewBox="0 0 100 100">
+                        <defs>
+                            <linearGradient id="scoreGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                                <stop offset="0%" style="stop-color:#006554"/>
+                                <stop offset="100%" style="stop-color:#00c49a"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="score-ring-bg" cx="50" cy="50" r="45"/>
+                        <circle class="score-ring-fill" cx="50" cy="50" r="45"/>
+                    </svg>
+                    <div class="score-center">
+                        <span class="score-number">74</span>
+                        <span class="score-label">/ 100</span>
+                    </div>
+                </div>
+
+                <div class="score-rules" style="width:100%; margin-top: clamp(0.6rem,1.5vh,1.2rem);">
+                    <div class="card-dark reveal" style="text-align:left;">
+                        <div style="font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim);margin-bottom:0.5em;letter-spacing:0.08em;">EXPLICATION IA GÉNÉRÉE</div>
+                        <p style="font-size:var(--small-size);color:var(--text-muted);line-height:1.6;font-style:italic;">
+                            "Votre profil présente un taux d'endettement de 31 % — en dessous du seuil de vigilance.
+                            Votre reste à vivre de 1 240 €/mois vous laisse une marge confortable.
+                            Le scénario Équilibré sur 20 ans est recommandé."
+                        </p>
+                    </div>
+                    <div class="card-dark reveal">
+                        <div style="font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim);margin-bottom:0.5em;letter-spacing:0.08em;">MODÈLE</div>
+                        <div style="display:flex;gap:0.5em;flex-wrap:wrap;">
+                            <span class="tag tag-gold">llama3.1:8b</span>
+                            <span class="tag tag-dim">Ollama local</span>
+                            <span class="tag tag-dim">0 cloud</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">06 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 7 — TABLEAU DE BORD
+     ================================================ -->
+<section class="slide slide-dashboard" id="slide-7">
+    <div class="bg-grid"></div>
+
+    <div class="slide-content">
+        <div class="dash-layout">
+            <div class="dash-left">
+                <span class="tag tag-green reveal" style="margin-bottom:0.8em;">Résultats</span>
+                <h2 class="reveal">Tableau de bord <span class="hl">complet</span></h2>
+
+                <div class="scenario-cards">
+                    <div class="scenario-card sc-prudent reveal">
+                        <span class="sc-name">PRUDENT</span>
+                        <div class="sc-data">
+                            <div class="sc-rate">3.45 %</div>
+                            <div class="sc-monthly">1 120 €/mois · 15 ans</div>
+                        </div>
+                    </div>
+                    <div class="scenario-card sc-equilibre reveal">
+                        <span class="sc-name">ÉQUILIBRÉ</span>
+                        <div class="sc-data">
+                            <div class="sc-rate">3.78 %</div>
+                            <div class="sc-monthly">890 €/mois · 20 ans</div>
+                        </div>
+                    </div>
+                    <div class="scenario-card sc-confort reveal">
+                        <span class="sc-name">CONFORT</span>
+                        <div class="sc-data">
+                            <div class="sc-rate">4.12 %</div>
+                            <div class="sc-monthly">740 €/mois · 25 ans</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="dash-right">
+                <div class="dash-widget reveal-scale">
+                    <div class="dash-widget-title">📈 Amortissement capital vs intérêts</div>
+                    <div class="mini-chart">
+                        <div class="mini-bar" style="height:20%"></div>
+                        <div class="mini-bar" style="height:25%"></div>
+                        <div class="mini-bar" style="height:35%"></div>
+                        <div class="mini-bar" style="height:45%"></div>
+                        <div class="mini-bar" style="height:55%"></div>
+                        <div class="mini-bar" style="height:63%"></div>
+                        <div class="mini-bar" style="height:72%"></div>
+                        <div class="mini-bar" style="height:79%"></div>
+                        <div class="mini-bar" style="height:85%"></div>
+                        <div class="mini-bar" style="height:90%"></div>
+                        <div class="mini-bar" style="height:94%"></div>
+                        <div class="mini-bar" style="height:97%"></div>
+                        <div class="mini-bar" style="height:100%; opacity:1;"></div>
+                    </div>
+                </div>
+
+                <div class="dash-widget reveal-scale">
+                    <div class="dash-widget-title">🏦 Comparaison des 9 banques (taux 20 ans)</div>
+                    <div class="bank-compare">
+                        <div class="bank-item"><div class="bank-name">BNP</div><div class="bank-rate-val">3.80 %</div></div>
+                        <div class="bank-item"><div class="bank-name">CA</div><div class="bank-rate-val">3.75 %</div></div>
+                        <div class="bank-item"><div class="bank-name">SG</div><div class="bank-rate-val">3.82 %</div></div>
+                        <div class="bank-item"><div class="bank-name">Bourso</div><div class="bank-rate-val">3.60 %</div></div>
+                        <div class="bank-item"><div class="bank-name">BP</div><div class="bank-rate-val">3.78 %</div></div>
+                        <div class="bank-item"><div class="bank-name">CM</div><div class="bank-rate-val">3.72 %</div></div>
+                        <div class="bank-item"><div class="bank-name">CE</div><div class="bank-rate-val">3.85 %</div></div>
+                        <div class="bank-item"><div class="bank-name">Pretto</div><div class="bank-rate-val">3.58 %</div></div>
+                        <div class="bank-item"><div class="bank-name">Bpi</div><div class="bank-rate-val">3.45 %</div></div>
+                    </div>
+                </div>
+
+                <div class="dash-widget reveal-scale">
+                    <div class="dash-widget-title">📤 Export</div>
+                    <div class="export-row">
+                        <button class="export-btn">📧 Email</button>
+                        <button class="export-btn">📄 PDF (soon)</button>
+                        <button class="export-btn">🔗 Partager</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">07 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 8 — API
+     ================================================ -->
+<section class="slide slide-api" id="slide-8">
+    <div class="bg-grid"></div>
+    <div class="accent-line"></div>
+
+    <div class="slide-content">
+        <div class="api-layout">
+            <div class="api-left">
+                <span class="tag tag-green reveal" style="margin-bottom:0.8em;">REST API</span>
+                <h2 class="reveal">Endpoints <span class="hl">propres</span><br>&amp; documentés</h2>
+
+                <div class="endpoint-list">
+                    <div class="endpoint reveal">
+                        <span class="method m-post">POST</span>
+                        <div>
+                            <span class="ep-path">/api/auth/register/</span>
+                            <span class="ep-desc">Inscription + liaison simulation anonyme (JWT)</span>
+                        </div>
+                    </div>
+                    <div class="endpoint reveal">
+                        <span class="method m-post">POST</span>
+                        <div>
+                            <span class="ep-path">/api/simulations/</span>
+                            <span class="ep-desc">Créer simulation — public, sans compte requis</span>
+                        </div>
+                    </div>
+                    <div class="endpoint reveal">
+                        <span class="method m-post">POST</span>
+                        <div>
+                            <span class="ep-path">/api/simulations/{id}/calcul/</span>
+                            <span class="ep-desc">Lancer calcul + scoring IA Ollama</span>
+                        </div>
+                    </div>
+                    <div class="endpoint reveal">
+                        <span class="method m-get">GET</span>
+                        <div>
+                            <span class="ep-path">/api/simulations/{id}/</span>
+                            <span class="ep-desc">Résultats complets + explication IA</span>
+                        </div>
+                    </div>
+                    <div class="endpoint reveal">
+                        <span class="method m-get">GET</span>
+                        <div>
+                            <span class="ep-path">/api/users/me/simulations/</span>
+                            <span class="ep-desc">Historique (JWT requis)</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="api-right">
+                <div class="code-block reveal-scale">
+<span class="cmt"># POST /api/simulations/{id}/calcul/</span>
+<span class="cmt"># Réponse JSON</span>
+{
+  <span class="str">"score_ia"</span>: <span class="num">74</span>,
+  <span class="str">"scenarios"</span>: {
+    <span class="str">"prudent"</span>:   { <span class="str">"taux"</span>: <span class="num">3.45</span>, <span class="str">"mensualite"</span>: <span class="num">1120</span> },
+    <span class="str">"equilibre"</span>: { <span class="str">"taux"</span>: <span class="num">3.78</span>, <span class="str">"mensualite"</span>: <span class="num">890</span>  },
+    <span class="str">"confort"</span>:    { <span class="str">"taux"</span>: <span class="num">4.12</span>, <span class="str">"mensualite"</span>: <span class="num">740</span>  }
+  },
+  <span class="str">"explication"</span>: <span class="str">"Votre taux d'endettement..."</span>,
+  <span class="str">"recommandations"</span>: [ <span class="str">"..."</span> ],
+  <span class="str">"avertissements"</span>: []
+}
+                </div>
+
+                <div class="api-badges reveal">
+                    <span class="tag tag-green">OpenAPI 3.0</span>
+                    <span class="tag tag-green">Swagger UI</span>
+                    <span class="tag tag-dim">ReDoc</span>
+                    <span class="tag tag-gold">JWT Auth</span>
+                    <span class="tag tag-dim">Session hybride</span>
+                </div>
+
+                <div class="card-dark reveal" style="margin-top:0.3rem;">
+                    <div style="font-family:var(--font-mono);font-size:var(--small-size);color:var(--text-dim);margin-bottom:0.4em;">AUTO-DOC</div>
+                    <p style="font-size:var(--small-size);color:var(--text-muted);">
+                        drf-spectacular génère automatiquement la documentation OpenAPI.
+                        Swagger UI disponible sur <span style="color:var(--green-light);font-family:var(--font-mono);">/api/docs/</span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">08 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 9 — BANQUES & DONNÉES
+     ================================================ -->
+<section class="slide slide-banks" id="slide-9">
+    <div class="bg-grid"></div>
+
+    <div class="slide-content">
+        <div class="banks-header">
+            <span class="tag tag-dim reveal" style="margin-bottom:0.6em;">Données</span>
+            <h2 class="reveal"><span class="hl">9 banques réelles</span> — Taux barème mars 2026</h2>
+            <p class="reveal">Immobilier (4 durées) · Étudiant (3 durées) · Mis à jour chaque mois</p>
+        </div>
+
+        <div class="bank-grid">
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">BNP Paribas</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.25%</span>
+                    <span class="rate-chip">15a 3.55%</span>
+                    <span class="rate-chip">20a 3.80%</span>
+                    <span class="rate-chip">25a 4.05%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Crédit Agricole</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.20%</span>
+                    <span class="rate-chip">15a 3.50%</span>
+                    <span class="rate-chip">20a 3.75%</span>
+                    <span class="rate-chip">25a 4.00%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Société Générale</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.28%</span>
+                    <span class="rate-chip">15a 3.58%</span>
+                    <span class="rate-chip">20a 3.82%</span>
+                    <span class="rate-chip">25a 4.10%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Boursorama</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.10%</span>
+                    <span class="rate-chip">15a 3.38%</span>
+                    <span class="rate-chip">20a 3.60%</span>
+                    <span class="rate-chip">25a 3.88%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Banque Populaire</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.22%</span>
+                    <span class="rate-chip">15a 3.52%</span>
+                    <span class="rate-chip">20a 3.78%</span>
+                    <span class="rate-chip">25a 4.02%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Crédit Mutuel</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.18%</span>
+                    <span class="rate-chip">15a 3.48%</span>
+                    <span class="rate-chip">20a 3.72%</span>
+                    <span class="rate-chip">25a 3.98%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Caisse d'Épargne</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.30%</span>
+                    <span class="rate-chip">15a 3.60%</span>
+                    <span class="rate-chip">20a 3.85%</span>
+                    <span class="rate-chip">25a 4.12%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Pretto</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 3.08%</span>
+                    <span class="rate-chip">15a 3.35%</span>
+                    <span class="rate-chip">20a 3.58%</span>
+                    <span class="rate-chip">25a 3.85%</span>
+                </div>
+            </div>
+            <div class="bank-card reveal-scale">
+                <div class="bank-card-name">Bpifrance</div>
+                <div class="bank-rates">
+                    <span class="rate-chip">10a 2.90%</span>
+                    <span class="rate-chip">15a 3.20%</span>
+                    <span class="rate-chip">20a 3.45%</span>
+                    <span class="rate-chip">25a 3.70%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="rates-legend reveal">
+            <div class="legend-item"><span class="legend-dot"></span>Taux hors assurance</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--gold);"></span>Étudiant : 3 tranches disponibles</div>
+            <div class="legend-item"><span class="legend-dot" style="background:var(--text-dim);"></span>Barème mis à jour mars 2026</div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">09 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 10 — ROADMAP
+     ================================================ -->
+<section class="slide slide-roadmap" id="slide-10">
+    <div class="bg-grid"></div>
+    <div class="accent-line"></div>
+
+    <div class="slide-content">
+        <div class="roadmap-header">
+            <span class="tag tag-dim reveal" style="margin-bottom:0.6em;">Évolutions</span>
+            <h2 class="reveal">Roadmap <span class="hl">2026</span></h2>
+        </div>
+
+        <div class="timeline">
+            <div class="timeline-item reveal-scale">
+                <div class="timeline-phase"><span class="phase-badge pb-now">MVP ✓</span></div>
+                <div class="timeline-body">
+                    <h4>Core — Livré</h4>
+                    <p>Wizard 3 étapes · 9 banques · Score IA · 3 scénarios · JWT · Docker</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal-scale">
+                <div class="timeline-phase"><span class="phase-badge pb-q2">Q2 2026</span></div>
+                <div class="timeline-body">
+                    <h4>Export PDF WeasyPrint</h4>
+                    <p>Génération PDF client côté serveur avec mise en page premium et traçabilité RGPD.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal-scale">
+                <div class="timeline-phase"><span class="phase-badge pb-q2">Q2 2026</span></div>
+                <div class="timeline-body">
+                    <h4>Import CSV taux bancaires</h4>
+                    <p>Interface admin pour mise à jour mensuelle des barèmes via fichier CSV standardisé.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal-scale">
+                <div class="timeline-phase"><span class="phase-badge pb-q3">Q3 2026</span></div>
+                <div class="timeline-body">
+                    <h4>Conformité RGPD</h4>
+                    <p>Consentement explicite · Droit à l'oubli · Portabilité des données · DPO workflow.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal-scale">
+                <div class="timeline-phase"><span class="phase-badge pb-q3">Q3 2026</span></div>
+                <div class="timeline-body">
+                    <h4>CI/CD Pipeline</h4>
+                    <p>GitHub Actions · Tests automatisés · Déploiement continu · Monitoring Sentry.</p>
+                </div>
+            </div>
+            <div class="timeline-item reveal-scale">
+                <div class="timeline-phase"><span class="phase-badge pb-q4">Q4 2026</span></div>
+                <div class="timeline-body">
+                    <h4>API Partenaires</h4>
+                    <p>Connexion temps réel avec APIs bancaires · Taux live · Pré-accord en ligne.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="corner-mark">SmartCredit 2026</span>
+    <span class="slide-num">10 / 11</span>
+</section>
+
+<!-- ================================================
+     SLIDE 11 — CONCLUSION
+     ================================================ -->
+<section class="slide slide-conclusion" id="slide-11">
+    <div class="bg-orb bg-orb cover-bg-orb-1"></div>
+    <div class="bg-orb bg-orb cover-bg-orb-2"></div>
+    <div class="bg-grid"></div>
+
+    <div class="slide-content">
+        <div class="conclusion-inner">
+            <span class="tag tag-green reveal">Conclusion</span>
+
+            <h2 class="conclusion-title reveal">
+                Prêt pour<br>
+                <span class="hl">la démo live.</span>
+            </h2>
+
+            <p class="conclusion-subtitle reveal">
+                SmartCredit simplifie radicalement la comparaison de crédit en France.
+                Stack Django REST robuste, IA locale souveraine, UX sans friction.
+                Déployable en 2 commandes Docker.
+            </p>
+
+            <div class="conclusion-cta reveal">
+                <button class="btn-primary">🚀 Lancer la démo</button>
+                <button class="btn-outline">📖 Swagger /api/docs/</button>
+                <button class="btn-outline">🐳 docker compose up</button>
+            </div>
+
+            <div class="conclusion-stats reveal">
+                <div class="c-stat">
+                    <div class="c-val">9</div>
+                    <div class="c-lbl">banques</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-val">&lt;3'</div>
+                    <div class="c-lbl">simulation</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-val">0</div>
+                    <div class="c-lbl">inscription</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-val">100%</div>
+                    <div class="c-lbl">open source</div>
+                </div>
+                <div class="c-stat">
+                    <div class="c-val">0</div>
+                    <div class="c-lbl">cloud IA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <span class="slide-num">11 / 11</span>
+</section>
+
+<script>
+/* ===========================================
+   SLIDE PRESENTATION CONTROLLER
+   SmartCredit — Navigation + Animations
+   =========================================== */
+class SlidePresentation {
+    constructor() {
+        this.slides = document.querySelectorAll('.slide');
+        this.totalSlides = this.slides.length;
+        this.currentIndex = 0;
+        this.isScrolling = false;
+        this.touchStartY = 0;
+
+        this.progressBar = document.getElementById('progressBar');
+        this.navDotsContainer = document.getElementById('navDots');
+
+        this.init();
+    }
+
+    init() {
+        this.setupNavDots();
+        this.setupIntersectionObserver();
+        this.setupKeyboardNav();
+        this.setupTouchNav();
+        this.setupWheelNav();
+    }
+
+    /* --- Navigation dots --- */
+    setupNavDots() {
+        this.slides.forEach((_, i) => {
+            const dot = document.createElement('button');
+            dot.className = 'nav-dot' + (i === 0 ? ' active' : '');
+            dot.setAttribute('aria-label', `Slide ${i + 1}`);
+            dot.addEventListener('click', () => this.goTo(i));
+            this.navDotsContainer.appendChild(dot);
+        });
+    }
+
+    updateDots(index) {
+        document.querySelectorAll('.nav-dot').forEach((d, i) => {
+            d.classList.toggle('active', i === index);
+        });
+    }
+
+    updateProgress(index) {
+        const pct = ((index + 1) / this.totalSlides) * 100;
+        this.progressBar.style.width = pct + '%';
+    }
+
+    /* --- Intersection Observer for animations --- */
+    setupIntersectionObserver() {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    const index = Array.from(this.slides).indexOf(entry.target);
+                    this.currentIndex = index;
+                    this.updateDots(index);
+                    this.updateProgress(index);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        this.slides.forEach(slide => observer.observe(slide));
+    }
+
+    /* --- Keyboard navigation --- */
+    setupKeyboardNav() {
+        document.addEventListener('keydown', (e) => {
+            if (['ArrowDown', 'ArrowRight', ' ', 'PageDown'].includes(e.key)) {
+                e.preventDefault();
+                this.next();
+            } else if (['ArrowUp', 'ArrowLeft', 'PageUp'].includes(e.key)) {
+                e.preventDefault();
+                this.prev();
+            } else if (e.key === 'Home') {
+                e.preventDefault();
+                this.goTo(0);
+            } else if (e.key === 'End') {
+                e.preventDefault();
+                this.goTo(this.totalSlides - 1);
+            }
+        });
+    }
+
+    /* --- Touch / swipe support --- */
+    setupTouchNav() {
+        document.addEventListener('touchstart', (e) => {
+            this.touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchend', (e) => {
+            const delta = this.touchStartY - e.changedTouches[0].clientY;
+            if (Math.abs(delta) > 50) {
+                delta > 0 ? this.next() : this.prev();
+            }
+        }, { passive: true });
+    }
+
+    /* --- Mouse wheel (debounced) --- */
+    setupWheelNav() {
+        let wheelTimer = null;
+        document.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            if (wheelTimer) return;
+            wheelTimer = setTimeout(() => { wheelTimer = null; }, 800);
+            e.deltaY > 0 ? this.next() : this.prev();
+        }, { passive: false });
+    }
+
+    /* --- Navigation methods --- */
+    goTo(index) {
+        const target = this.slides[index];
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+
+    next() {
+        if (this.currentIndex < this.totalSlides - 1) {
+            this.goTo(this.currentIndex + 1);
+        }
+    }
+
+    prev() {
+        if (this.currentIndex > 0) {
+            this.goTo(this.currentIndex - 1);
+        }
+    }
+}
+
+// Boot
+new SlidePresentation();
+
+// Activate first slide immediately
+document.querySelector('.slide').classList.add('visible');
+</script>
+</body>
+</html>

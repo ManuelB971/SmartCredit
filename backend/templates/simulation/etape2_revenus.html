@@ -29,6 +29,15 @@
             <button type="button" class="btn-contrat px-6 py-2.5 rounded-full border border-outline-variant/30 text-on-surface-variant font-medium text-sm hover:bg-surface-container-low transition-colors" data-value="ETUDIANT">Étudiant</button>
           </div>
           <input type="hidden" id="type_contrat" name="type_contrat" value="CDI"/>
+          <div class="mt-5">
+            <label class="block text-sm font-semibold text-on-surface-variant mb-3 uppercase tracking-widest">Ancienneté dans l'emploi</label>
+            <div class="flex flex-wrap gap-3">
+              <button type="button" class="btn-anciennete px-5 py-2 rounded-full border border-primary text-primary font-medium text-sm hover:bg-primary/5 transition-colors" data-mois="3">&lt; 6 mois</button>
+              <button type="button" class="btn-anciennete px-5 py-2 rounded-full border border-outline-variant/30 text-on-surface-variant font-medium text-sm hover:bg-surface-container-low transition-colors" data-mois="12">6 mois – 2 ans</button>
+              <button type="button" class="btn-anciennete px-5 py-2 rounded-full border border-outline-variant/30 text-on-surface-variant font-medium text-sm hover:bg-surface-container-low transition-colors" data-mois="36">&gt; 2 ans</button>
+            </div>
+            <input type="hidden" id="anciennete_emploi_mois" name="anciennete_emploi_mois" value="3"/>
+          </div>
         </section>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-8 mt-8">
           <div class="space-y-2">
